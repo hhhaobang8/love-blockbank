@@ -687,7 +687,7 @@
     <!-- 滚动公告栏 (管理员可在代码中配置文字) -->
     <div style="background: rgba(255, 215, 0, 0.1); padding: 8px 0; overflow: hidden; white-space: nowrap; border-bottom: 1px solid rgba(255, 215, 0, 0.3); border-top: 1px solid rgba(255, 215, 0, 0.3); margin-top: 5px; position: relative;">
       <div style="display: inline-block; padding-left: 100%; animation: marquee 25s linear infinite; color: #ffd700; font-size: 13px; font-weight: bold;">
-        📢 <span id="adminScrollingText">🎉 欢迎来到统一社区互助生态！ 🚀 全球生态节点持续爆发中... 🏆 恭喜 #0002 号节点荣升 V4 联合创始人！ 🏆 恭喜 #0058 号节点荣升 V3 高级合伙人！</span>
+        📢 <span id="adminScrollingText">🎉 欢迎来到爱心社区互助生态！ 🚀 全球生态节点持续爆发中... 🏆 恭喜 #0002 号节点荣升 V4 联合创始人！ 🏆 恭喜 #0058 号节点荣升 V3 高级合伙人！</span>
       </div>
     </div>
     <style>
@@ -1268,7 +1268,7 @@
       // ⚠️ 前端开发必看：请在下方替换为您真正在币安链部署的主合约地址
       // ==========================================
       const DEFAULT_ADDRESS =
-        "0xd40b700e44603591f5e0fb2b89d646f2dc423d57".toLowerCase();
+        "0x65d41ab3603f30de19136b6c8e2d64ab1e75f110".toLowerCase();
       
       // 使用全新的本地存储键名，彻底避开旧浏览器的死缓存
       let CONTRACT_ADDRESS = localStorage.getItem("v2_contract_address") || DEFAULT_ADDRESS;
@@ -1278,6 +1278,11 @@
         document.getElementById("devMainContract").value = CONTRACT_ADDRESS;
         
         const rpcUrls = [
+          // Mainnet
+          "https://bsc-dataseed.binance.org/",
+          "https://rpc.ankr.com/bsc",
+          "https://1rpc.io/bnb",
+          // Testnet
           "https://data-seed-prebsc-1-s1.binance.org:8545/",
           "https://data-seed-prebsc-2-s1.binance.org:8545/",
           "https://bsc-testnet-rpc.publicnode.com"

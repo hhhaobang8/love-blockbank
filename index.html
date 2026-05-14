@@ -2,13 +2,13 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
     <title>Love Block Bank - 爱心区块银行</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     
+    <!-- 多语言字典与逻辑 -->
     <script>
-      // ========== 多语言字典 ==========
       const I18N_DICT = {
         "爱心区块银行": { "zh-TW": "愛心區塊銀行", "en": "Love Block Bank" },
         "选择连接的钱包": { "zh-TW": "選擇連接的錢包", "en": "Select Wallet" },
@@ -56,69 +56,63 @@
         "执行贡献等级认证": { "zh-TW": "執行貢獻等級認證", "en": "Execute Certification" },
         "身份勋章与等级路线": { "zh-TW": "身份勳章與等級路線", "en": "Badges & Levels" },
         "初级节点": { "zh-TW": "初級節點", "en": "Primary Node" },
-        "直推10个节点": { "zh-TW": "直推10個節點", "en": "Direct 10 Nodes" },
-        "含2个V1线": { "zh-TW": "含2個V1線", "en": "2 V1 Lines" },
-        "含2个V2线": { "zh-TW": "含2個V2線", "en": "2 V2 Lines" },
-        "含3个V3线": { "zh-TW": "含3個V3線", "en": "3 V3 Lines" },
-        "请先连接钱包并参与入金，解锁您的权限进度。": {
-          "zh-TW":"請先連接錢包並參與入金，解鎖您的權限進度。",
-          "en":"Connect wallet and join to unlock progress."
-        },
-        "全生态分账节点奖励 (多币种全享)": {
-          "zh-TW":"全生態分賬節點獎勵 (多幣種全享)",
-          "en":"Global Eco Rewards (All Tokens)"
-        },
-        "请先连接钱包并参与入金，这里将展示5大生态币种的分润与提现": {
-          "zh-TW":"請先連接錢包並參與入金，這裡將展示5大生態幣種的分潤與提現",
-          "en":"Connect and join to view 5 eco-token dividends"
-        },
-        "*提现规则: 70%到账您的钱包，剩余30%分配给全网上下公排节点与生态": {
-          "zh-TW":"*提現規則: 70%到賬您的錢包，剩餘30%分配給全網上下公排節點與生態",
-          "en":"*Withdrawal: 70% to wallet, 30% to network & eco"
-        },
-        "开发者选项 / 调试用": { "zh-TW":"開發者選項 / 調試用", "en":"Dev Options" },
-        "在此粘贴主合约地址": { "zh-TW":"在此粘貼主合約地址", "en":"Paste contract address" },
-        "保存地址": { "zh-TW":"保存地址", "en": "Save" },
-        "普通": { "zh-TW": "普通", "en": "Normal" },
-        "排队号": { "zh-TW": "排隊號", "en": "Queue No" },
-        "等级": { "zh-TW": "等級", "en": "Level" },
-        "无推荐人": { "zh-TW": "無推薦人", "en": "No Referrer" },
-        "暂无推荐记录": { "zh-TW": "暫無推薦記錄", "en": "No referrals" },
-        "1代直推": { "zh-TW": "1代直推", "en": "1st Gen" },
-        "间推团队": { "zh-TW": "間推團隊", "en": "Indirect Team" },
-        "人": { "zh-TW": "人", "en": "" },
-        "间推": { "zh-TW": "間推", "en": "Indirect" },
-        "暂无间推记录": { "zh-TW": "暫無間推記錄", "en": "No indirect" },
-        "溢出资金:": { "zh-TW": "溢出資金:", "en": "Overflow:" },
-        "暂无数据": { "zh-TW": "暫無數據", "en": "No data" },
-        "生态区": { "zh-TW": "生態區", "en": "Eco Zone" },
-        "可提现": { "zh-TW": "可提現", "en": "Withdrawable" },
-        "暂无分红": { "zh-TW": "暫無分紅", "en": "No Dividends" },
-        "入金标准": { "zh-TW": "入金標準", "en": "Entry Standard" },
-        "静态分红 (公排)": { "zh-TW": "靜態分紅 (公排)", "en": "Static (Queue)" },
-        "动态分红 (极差)": { "zh-TW": "動態分紅 (極差)", "en": "Dynamic (Diff)" },
-        "总计可提现:": { "zh-TW": "總計可提現:", "en": "Total:" },
-        "提取收益": { "zh-TW": "提取收益", "en": "Withdraw" },
-        "生态已激活": { "zh-TW": "生態已激活", "en": "Eco Activated" },
-        "您的节点已激活此生态权限": { "zh-TW": "您的節點已激活此生態權限", "en": "Eco activated" }
+        "直推 10 个节点": { "zh-TW": "直推 10 個節點", "en": "Direct 10 Nodes" },
+        "含 2 个 V1 线": { "zh-TW": "含 2 個 V1 線", "en": "2 V1 Lines" },
+        "含 2 个 V2 线": { "zh-TW": "含 2 個 V2 線", "en": "2 V2 Lines" },
+        "含 3 个 V3 线": { "zh-TW": "含 3 個 V3 線", "en": "3 V3 Lines" },
+        "请先连接钱包并参与入金，解锁您的权限进度。": {"zh-TW":"請先連接錢包並參與入金，解鎖您的權限進度。","en":"Connect wallet and join to unlock progress."},
+        "全生态分账节点奖励 (多币种全享)": {"zh-TW":"全生態分賬節點獎勵 (多幣種全享)","en":"Global Eco Rewards (All Tokens)"},
+        "请先连接钱包并参与入金，这里将展示 5 大生态币种的分润与提现": {"zh-TW":"請先連接錢包並參與入金，這裡將展示 5 大生態幣種的分潤與提現","en":"Connect and join to view 5 eco-token dividends"},
+        "*提现规则：70% 到账您的钱包，剩余 30% 分配给全网上下公排节点与生态": {"zh-TW":"*提現規則：70% 到賬您的錢包，剩餘 30% 分配給全網上下公排節點與生態","en":"*Withdrawal: 70% to wallet, 30% to network & eco"},
+        "开发者选项 / 调试用": {"zh-TW":"開發者選項 / 調試用","en":"Dev Options"},
+        "在此粘贴主合约地址": {"zh-TW":"在此粘貼主合約地址","en":"Paste contract address"},
+        "保存地址": {"zh-TW":"保存地址","en":"Save"},
+        "普通": {"zh-TW": "普通", "en": "Normal"},
+        "排队号": {"zh-TW": "排隊號", "en": "Queue No"},
+        "等级": {"zh-TW": "等級", "en": "Level"},
+        "无推荐人": {"zh-TW": "無推薦人", "en": "No Referrer"},
+        "暂无推荐记录": {"zh-TW": "暫無推薦記錄", "en": "No referrals"},
+        "1 代直推": {"zh-TW": "1 代直推", "en": "1st Gen"},
+        "间推团队": {"zh-TW": "間推團隊", "en": "Indirect Team"},
+        "人": {"zh-TW": "人", "en": ""},
+        "间推": {"zh-TW": "間推", "en": "Indirect"},
+        "暂无间推记录": {"zh-TW": "暫無間推記錄", "en": "No indirect"},
+        "溢出资金:": {"zh-TW": "溢出資金:", "en": "Overflow:"},
+        "暂无数据": {"zh-TW": "暫無數據", "en": "No data"},
+        "生态区": {"zh-TW": "生態區", "en": "Eco Zone"},
+        "可提现": {"zh-TW": "可提現", "en": "Withdrawable"},
+        "暂无分红": {"zh-TW": "暫無分紅", "en": "No Dividends"},
+        "入金标准": {"zh-TW": "入金標準", "en": "Entry Standard"},
+        "静态分红 (公排)": {"zh-TW": "靜態分紅 (公排)", "en": "Static (Queue)"},
+        "动态分红 (极差)": {"zh-TW": "動態分紅 (極差)", "en": "Dynamic (Diff)"},
+        "总计可提现:": {"zh-TW": "總計可提現:", "en": "Total:"},
+        "提取收益": {"zh-TW": "提取收益", "en": "Withdraw"},
+        "生态已激活": {"zh-TW": "生態已激活", "en": "Eco Activated"},
+        "您的节点已激活此生态权限": {"zh-TW": "您的節點已激活此生態權限", "en": "Eco activated"}
       };
 
       let currentLang = localStorage.getItem("lang") || "zh-CN";
 
-      // ========== 翻译函数 ==========
+      // 翻译辅助函数
       function t(text) {
         if (!text || currentLang === "zh-CN") return text;
         if (I18N_DICT[text] && I18N_DICT[text][currentLang]) {
           return I18N_DICT[text][currentLang];
         }
+        // 模糊匹配
+        for (let key in I18N_DICT) {
+          if (text.includes(key) && I18N_DICT[key][currentLang]) {
+             return text.replace(key, I18N_DICT[key][currentLang]);
+          }
+        }
         return text;
       }
 
-      // ========== 更新DOM树（修复语言切换）==========
+      // 更新 DOM 树（核心修复：语言切换逻辑）
       function updateDOMTree() {
-        if (currentLang === "zh-CN") return; // 简体中文不需要转换
+        if (currentLang === "zh-CN") return; 
         
-        // 更新所有文本节点
+        // 1. 更新带有 data-i18n 属性的元素
         document.querySelectorAll('[data-i18n]').forEach(el => {
           const key = el.getAttribute('data-i18n');
           if (key && I18N_DICT[key] && I18N_DICT[key][currentLang]) {
@@ -126,7 +120,7 @@
           }
         });
         
-        // 更新placeholder
+        // 2. 更新 placeholder
         document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
           const key = el.getAttribute('data-i18n-placeholder');
           if (key && I18N_DICT[key] && I18N_DICT[key][currentLang]) {
@@ -134,49 +128,28 @@
           }
         });
         
-        // 遍历所有文本节点（针对没有 data-i18n 的元素）
+        // 3. 遍历文本节点（针对没有 data-i18n 的硬编码文本）
         const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
         let node;
         while(node = walker.nextNode()) {
-          if (node.parentElement && node.parentElement.tagName === 'SCRIPT') continue;
-          if (node.parentElement && node.parentElement.tagName === 'STYLE') continue;
+          if (node.parentElement && (node.parentElement.tagName === 'SCRIPT' || node.parentElement.tagName === 'STYLE')) continue;
           
           const text = node.nodeValue.trim();
           if (!text || text.length < 2) continue;
           
-          // 检查是否在字典中
           if (I18N_DICT[text] && I18N_DICT[text][currentLang]) {
             node.nodeValue = node.nodeValue.replace(text, I18N_DICT[text][currentLang]);
           }
         }
       }
 
-      // ========== 语言切换函数 ==========
       function changeLanguage(lang) {
         currentLang = lang;
         localStorage.setItem("lang", lang);
-        
-        // 更新下拉框
-        const select = document.getElementById("langSwitcher");
-        if (select) select.value = lang;
-        
-        // 更新DOM
         updateDOMTree();
-        
-        // 刷新显示
-        if (typeof refreshAll === 'function') {
-          setTimeout(refreshAll, 100);
-        }
+        // 刷新部分动态内容
+        if(typeof loadAdminEcoPool === 'function') setTimeout(loadAdminEcoPool, 100);
       }
-
-      // 页面加载时初始化语言
-      $(document).ready(function() {
-        const select = document.getElementById("langSwitcher");
-        if (select) {
-          select.value = currentLang;
-        }
-        updateDOMTree();
-      });
     </script>
 
     <style>
@@ -789,7 +762,7 @@
     <header>
       <div class="logo">
         <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='heartGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ff00ff'/%3E%3Cstop offset='100%25' stop-color='%23690968'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpolygon points='50,10 93,30 93,70 50,90 7,70 7,30' fill='none' stroke='url(%23heartGrad)' stroke-width='4'/%3E%3Cpath d='M 50 42 C 50 42, 35 22, 20 32 C 5 47, 20 67, 50 82 C 80 67, 95 47, 80 32 C 65 22, 50 42, 50 42 Z' fill='url(%23heartGrad)'/%3E%3C/svg%3E" alt="Love Block Bank Logo" />
-        <div data-i18n="爱心区块银行">爱心区块银行</div>
+        <div data-i18n="爱心区块银行">爱心区块银行<br /><span>Love Block Bank</span></div>
       </div>
       <div style="display: flex; align-items: center; gap: 10px;">
         <select id="langSwitcher" onchange="changeLanguage(this.value)" style="background: rgba(0,0,0,0.5); color: #fff; border: 1px solid #ff00ff; border-radius: 5px; padding: 4px; font-size: 12px; cursor: pointer; outline: none;">
@@ -806,7 +779,7 @@
     <!-- 滚动公告栏 -->
     <div style="background: rgba(255, 215, 0, 0.1); padding: 8px 0; overflow: hidden; white-space: nowrap; border-bottom: 1px solid rgba(255, 215, 0, 0.3); border-top: 1px solid rgba(255, 215, 0, 0.3); margin-top: 5px; position: relative;">
       <div style="display: inline-block; padding-left: 100%; animation: marquee 25s linear infinite; color: #ffd700; font-size: 13px; font-weight: bold;">
-        📢 <span id="adminScrollingText">🎉 🎉特意为你留的生日惊喜！！！🎂生日快乐 我最爱的宝贝❤️❤️✨有幸相逢、、、此生相守、、，往后每一年的生日、、，我都想陪在你身边👩‍❤️‍👨、、，愿你被温柔以待、、，永远开心、永远被我偏爱❤️😘💖</span>
+        📢 <span id="adminScrollingText">🎉 🎉特意为你留的生日惊喜！！！🎂生日快乐 我最爱的宝贝❤️❤️✨有幸相逢、、、此生相守、、，往后每一年的生日、、，我都想陪在你身边👩‍❤️👨、、，愿你被温柔以待、、，永远开心、永远被我偏爱❤️😘💖</span>
       </div>
     </div>
     <style>
@@ -977,22 +950,22 @@
           <div class="badge-item" id="badge-route-1" style="opacity: 0.2; filter: grayscale(100%); transition: all 0.3s ease; width: 18%;">
             <img src="https://cryptologos.cc/logos/bnb-bnb-logo.svg" style="width: 30px; height: 30px; border-radius: 50%; background: #fff; padding: 3px;" />
             <p style="margin: 5px 0 0; font-size: 14px; font-weight: bold; color: #fff;">V1 <span style="font-size: 10px; color: #ccc">BNB</span></p>
-            <p style="margin: 3px 0 0; font-size: 10px; color: #999" data-i18n="直推10个节点">直推10个节点</p>
+            <p style="margin: 3px 0 0; font-size: 10px; color: #999" data-i18n="直推 10 个节点">直推 10 个节点</p>
           </div>
           <div class="badge-item" id="badge-route-2" style="opacity: 0.2; filter: grayscale(100%); transition: all 0.3s ease; width: 18%;">
             <img src="https://cryptologos.cc/logos/ethereum-eth-logo.svg" style="width: 30px; height: 30px; border-radius: 50%; background: #fff; padding: 3px;" />
             <p style="margin: 5px 0 0; font-size: 14px; font-weight: bold; color: #fff;">V2 <span style="font-size: 10px; color: #ccc">ETH</span></p>
-            <p style="margin: 3px 0 0; font-size: 10px; color: #999" data-i18n="含2个V1线">含2个V1线</p>
+            <p style="margin: 3px 0 0; font-size: 10px; color: #999" data-i18n="含 2 个 V1 线">含 2 个 V1 线</p>
           </div>
           <div class="badge-item" id="badge-route-3" style="opacity: 0.2; filter: grayscale(100%); transition: all 0.3s ease; width: 18%;">
             <img src="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23eebb4d'/%3E%3Cg fill='%23FFFFFF'%3E%3Crect x='40' y='35' width='20' height='10' rx='2'/%3E%3Crect x='28' y='50' width='20' height='10' rx='2'/%3E%3Crect x='52' y='50' width='20' height='10' rx='2'/%3E%3C/g%3E%3C/svg%3E" style="width: 30px; height: 30px; border-radius: 50%; background: #fff; padding: 3px;" />
             <p style="margin: 5px 0 0; font-size: 14px; font-weight: bold; color: #fff;">V3 <span style="font-size: 10px; color: #ccc">PAXG</span></p>
-            <p style="margin: 3px 0 0; font-size: 10px; color: #999" data-i18n="含2个V2线">含2个V2线</p>
+            <p style="margin: 3px 0 0; font-size: 10px; color: #999" data-i18n="含 2 个 V2 线">含 2 个 V2 线</p>
           </div>
           <div class="badge-item" id="badge-route-4" style="opacity: 0.2; filter: grayscale(100%); transition: all 0.3s ease; width: 18%;">
             <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.svg" style="width: 30px; height: 30px; border-radius: 50%; background: #fff; padding: 3px;" />
             <p style="margin: 5px 0 0; font-size: 14px; font-weight: bold; color: #fff;">V4 <span style="font-size: 10px; color: #ccc">BTCB</span></p>
-            <p style="margin: 3px 0 0; font-size: 10px; color: #999" data-i18n="含3个V3线">含3个V3线</p>
+            <p style="margin: 3px 0 0; font-size: 10px; color: #999" data-i18n="含 3 个 V3 线">含 3 个 V3 线</p>
           </div>
         </div>
         <div style="margin-top: 20px; padding: 12px; background: #1a0822; border-radius: 8px; border: 1px solid #4a1459; text-align: center;">
@@ -1003,9 +976,9 @@
       <div class="db_item">
         <p class="title" data-i18n="全生态分账节点奖励 (多币种全享)">全生态分账节点奖励 (多币种全享)</p>
         <div class="reward-grid" id="rewardListContainer">
-          <div style="text-align: center; width: 100%; color: #aaa; padding: 20px" data-i18n="请先连接钱包并参与入金，这里将展示5大生态币种的分润与提现">请先连接钱包并参与入金，这里将展示5大生态币种的分润与提现</div>
+          <div style="text-align: center; width: 100%; color: #aaa; padding: 20px" data-i18n="请先连接钱包并参与入金，这里将展示 5 大生态币种的分润与提现">请先连接钱包并参与入金，这里将展示 5 大生态币种的分润与提现</div>
         </div>
-        <p style="font-size: 12px; margin-top: 20px; color: #ff88ff; text-align: center;" data-i18n="*提现规则: 70%到账您的钱包，剩余30%分配给全网上下公排节点与生态">*提现规则: 70%到账您的钱包，剩余30%分配给全网上下公排节点与生态</p>
+        <p style="font-size: 12px; margin-top: 20px; color: #ff88ff; text-align: center;" data-i18n="*提现规则：70% 到账您的钱包，剩余 30% 分配给全网上下公排节点与生态">*提现规则：70% 到账您的钱包，剩余 30% 分配给全网上下公排节点与生态</p>
 
         <!-- 提币记录 -->
         <div style="margin-top: 20px; padding: 15px; background: rgba(0, 0, 0, 0.4); border-radius: 8px; border: 1px solid #444;">
@@ -1505,7 +1478,7 @@
                     
                     <div style="display: flex; gap: 10px;">
                       ${user.isJoined
-                        ? `<button class="reward-btn disabled" style="background:#444; border: 1px solid #666; cursor: not-allowed;" onclick="msg('${t("您的节点已激活此生态权限")}')" data-i18n="生态已激活">生态已激活</button>`
+                        ? `<button class="reward-btn disabled" style="background:#444; border: 1px solid #666; cursor: not-allowed;" onclick="msg('${t("您的节点已激活此生态权限')}')" data-i18n="生态已激活">生态已激活</button>`
                         : `<button class="reward-btn" style="background:#ff00ff;" onclick="participateSpec(${typeId})">${t("投入")} (${tokenData.name})</button>`
                       }
                       <button class="reward-btn ${hasFunds ? "" : "disabled"}" style="background:#690968;" onclick="${hasFunds ? `doWithdrawSpec(${typeId}, '${totalVal || 0}', ${decimals})` : ''}" ${hasFunds ? '' : 'disabled'}>
@@ -1760,6 +1733,7 @@
             return;
           }
 
+          // 修复：正确判断零地址
           const isZeroAddress = !myReferrer || myReferrer === "0x0000000000000000000000000000000000000000" || myReferrer === ethers.constants.AddressZero;
           
           if (!isZeroAddress && myReferrer.length === 42) {
@@ -1770,23 +1744,24 @@
               let uId = refUser.id.toString();
               ancestorsContainer.html(`<div style="background: #333; padding: 10px; border-radius: 8px;">
                   <span style="color: #ffd700; font-weight: bold;">${t("我的推荐人")}</span><br/>
-                  <span style="font-size: 12px; color: #fff;">
-                    ${t("地址: ")}${myReferrer.substring(0,6)}...${myReferrer.substring(38)}
+                  <span style="font-size: 13px; color: #fff; word-break: break-all;">
+                    ${t("地址: ")}${myReferrer}
                     <button onclick="copyAddress('${myReferrer}')" style="background: none; border: none; cursor: pointer; color: #00ffff; font-size: 14px; margin-left: 5px; padding: 0;" title="复制完整地址">📋</button>
                   </span><br/>
-                  <span style="font-size: 12px; color: #aaa;">${t("排队号: ")}${uId} | ${t("等级: ")}${lvlStr}</span>
+                  <span style="font-size: 12px; color: #aaa;">${t("排队号")}: ${uId} | ${t("等级")}: ${lvlStr}</span>
                 </div>`);
             } catch(e) {
               console.error(e);
               ancestorsContainer.html(`<div style="background: #333; padding: 10px; border-radius: 8px;">
                   <span style="color: #ffd700; font-weight: bold;">${t("我的推荐人")}</span><br/>
-                  <span style="font-size: 12px;">
-                    ${myReferrer.substring(0,6)}...${myReferrer.substring(38)}
+                  <span style="font-size: 13px; color: #fff; word-break: break-all;">
+                    ${t("地址: ")}${myReferrer}
                     <button onclick="copyAddress('${myReferrer}')" style="background: none; border: none; cursor: pointer; color: #00ffff; font-size: 14px; margin-left: 5px; padding: 0;" title="复制完整地址">📋</button>
                   </span>
                 </div>`);
             }
           } else {
+            // 修复：明确显示无推荐人原因
             if (isZeroAddress) {
               ancestorsContainer.html(`<div style="background: #333; padding: 10px; border-radius: 8px; color: #ff8888;">
                 ⚠️ ${t("无推荐人")}（当前节点为独立注册或推荐人字段未正确设置）
@@ -1827,7 +1802,7 @@
                               ${child.substring(0,6)}...${child.substring(38)}
                               <button onclick="copyAddress('${child}')" style="background: none; border: none; cursor: pointer; color: #00ffff; font-size: 14px; margin-left: 5px; padding: 0;" title="复制完整地址">📋</button>
                             </span> <br>
-                            <span style="font-size: 11px; font-weight: normal; color: #aaa;">${t("排队号: ")}${childUser.id.toString()} | ${t("等级: ")}${childLvlStr} | ${t("间推团队: ")}${validIndirects.length}${t("人")}</span>
+                            <span style="font-size: 11px; font-weight: normal; color: #aaa;">${t("排队号")}: ${childUser.id.toString()} | ${t("等级")}: ${childLvlStr} | ${t("间推团队")}: ${validIndirects.length}${t("人")}</span>
                           </div>
                        </div>
                     </summary>
@@ -1850,7 +1825,7 @@
                           ${sub.substring(0,6)}...${sub.substring(38)}
                           <button onclick="copyAddress('${sub}')" style="background: none; border: none; cursor: pointer; color: #00ffff; font-size: 14px; margin-left: 5px; padding: 0;" title="复制完整地址">📋</button>
                         </span><br>
-                        <span style="font-size: 11px; font-weight: normal; color: #aaa;">${t("排队号: ")}${subUser.id.toString()} | ${t("等级: ")}${subLvlStr}</span>
+                        <span style="font-size: 11px; font-weight: normal; color: #aaa;">${t("排队号")}: ${subUser.id.toString()} | ${t("等级")}: ${subLvlStr}</span>
                       </div>`;
                   }
                   treeHtml += `</div>`;
@@ -1884,6 +1859,7 @@
           $("#adminEcoPoolData").text(t("正在读取..."));
           let html = "";
           
+          // 修复：确保 tokenAddresses 已初始化
           if (Object.keys(tokenAddresses).length === 0) {
             tokenAddresses[1] = await mainContract.btcb();
             tokenAddresses[2] = await mainContract.eth();
@@ -1892,6 +1868,7 @@
             tokenAddresses[5] = await mainContract.paxg();
           }
           
+          // 循环读取 5 个币种的生态池数据
           for (let typeId = 1; typeId <= 5; typeId++) {
             const tokenData = PRICING[typeId];
             if (!tokenData) continue;

@@ -4,484 +4,247 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Love Block Bank - 爱心区块银行</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-            color: #fff;
-            min-height: 100vh;
-        }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        
-        /* 头部 */
-        .header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 20px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-        .logo { font-size: 24px; font-weight: bold; }
-        .connect-btn {
-            background: #8b5cf6;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #e2e8f0; min-height: 100vh; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 16px; }
+        .logo { font-size: 20px; font-weight: 700; color: #fbbf24; }
+        .connect-btn { background: #8b5cf6; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s; }
         .connect-btn:hover { background: #7c3aed; }
-        
-        /* 滚动公告 - 合规版 */
-        .announcement {
-            background: rgba(251, 191, 36, 0.2);
-            border-left: 4px solid #fbbf24;
-            padding: 12px 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-        
-        /* 节点总数 */
-        .total-nodes {
-            text-align: center;
-            padding: 30px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-        .total-nodes h2 { font-size: 18px; margin-bottom: 10px; color: #fbbf24; }
-        .total-nodes .number { font-size: 64px; font-weight: bold; color: #fbbf24; }
-        
-        /* 币种选择 */
-        .coin-selector {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-        .coin-btn {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 3px solid transparent;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        .coin-btn.active { border-color: #fbbf24; transform: scale(1.1); }
-        .coin-btn img { width: 50px; height: 50px; }
-        
-        /* 主操作区 */
-        .main-action {
-            text-align: center;
-            padding: 40px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-        .invest-btn {
-            background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
-            color: white;
-            border: none;
-            padding: 16px 48px;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            margin: 20px 0;
-        }
-        .wallet-balance { color: #94a3b8; margin: 10px 0; }
-        .referrer-input {
-            width: 100%;
-            max-width: 400px;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #475569;
-            background: rgba(255,255,255,0.1);
-            color: white;
-            margin: 10px 0;
-        }
-        
-        /* 个人资料卡片 */
-        .profile-card {
-            background: rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .profile-card h3 { margin-bottom: 15px; color: #fbbf24; }
-        .profile-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        /* 资金流向看板 - 公开透明 */
-        .fund-pool-card {
-            background: rgba(34, 197, 94, 0.2);
-            border: 2px solid #22c55e;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .fund-pool-card h3 { color: #22c55e; margin-bottom: 15px; }
-        .pool-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-        }
-        
-        /* 等级路线 */
-        .level-route {
-            background: rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .level-route h3 { margin-bottom: 15px; color: #fbbf24; }
-        .level-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 10px;
-            margin: 5px 0;
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-        }
-        
-        /* 开发者选项 - 测试期显示，主网隐藏 */
-        .dev-panel {
-            background: rgba(239, 68, 68, 0.2);
-            border: 2px dashed #ef4444;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            display: none; /* 主网默认隐藏 */
-        }
+        .announcement { background: rgba(251, 191, 36, 0.15); border-left: 4px solid #fbbf24; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; line-height: 1.5; }
+        .stat-card { text-align: center; padding: 24px; background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 16px; }
+        .stat-card h2 { font-size: 16px; color: #94a3b8; margin-bottom: 8px; }
+        .stat-card .number { font-size: 48px; font-weight: 800; color: #fbbf24; }
+        .coin-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
+        .coin-btn { background: rgba(255,255,255,0.05); border: 2px solid transparent; border-radius: 10px; padding: 12px 0; text-align: center; cursor: pointer; transition: 0.2s; }
+        .coin-btn.active { border-color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
+        .coin-btn img { width: 32px; height: 32px; margin-bottom: 4px; }
+        .coin-btn div { font-size: 12px; font-weight: 600; }
+        .action-card { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+        .action-card h3 { margin-bottom: 12px; color: #fbbf24; }
+        input, select, button.action-btn { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 14px; }
+        button.action-btn { background: #8b5cf6; border: none; cursor: pointer; font-weight: 600; }
+        button.action-btn:disabled { background: #475569; cursor: not-allowed; }
+        .pool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+        .pool-item { background: rgba(34, 197, 94, 0.1); border: 1px solid #22c55e; border-radius: 8px; padding: 12px; text-align: center; }
+        .pool-item h4 { font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
+        .pool-item .val { font-size: 18px; font-weight: 700; color: #22c55e; }
+        .profile-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #334155; font-size: 14px; }
+        .profile-item:last-child { border-bottom: none; }
+        .level-route { display: flex; gap: 8px; margin-top: 12px; overflow-x: auto; padding-bottom: 8px; }
+        .level-step { flex: 1; min-width: 100px; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 10px; text-align: center; font-size: 12px; }
+        .level-step.active { background: rgba(251, 191, 36, 0.2); border: 1px solid #fbbf24; }
+        .dev-panel { background: rgba(239, 68, 68, 0.1); border: 2px dashed #ef4444; border-radius: 12px; padding: 16px; margin-bottom: 16px; display: none; }
         .dev-panel.show { display: block; }
-        .dev-panel h3 { color: #ef4444; margin-bottom: 15px; }
-        
-        /* 创世V4分配状态 - 公开透明 */
-        .genesis-v4-status {
-            background: rgba(139, 92, 246, 0.2);
-            border: 2px solid #8b5cf6;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .genesis-v4-status h3 { color: #8b5cf6; margin-bottom: 10px; }
-        
-        /* 底部声明 */
-        .footer-declaration {
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #94a3b8;
-            text-align: center;
-        }
-        
-        /* 响应式 */
-        @media (max-width: 768px) {
-            .coin-selector { gap: 10px; }
-            .coin-btn { width: 60px; height: 60px; }
-            .coin-btn img { width: 40px; height: 40px; }
-        }
+        .log-box { background: #020617; border-radius: 8px; padding: 12px; font-family: monospace; font-size: 12px; max-height: 120px; overflow-y: auto; margin-top: 16px; color: #94a3b8; }
+        .footer { text-align: center; font-size: 12px; color: #64748b; margin-top: 24px; padding-top: 16px; border-top: 1px solid #334155; }
+        @media (max-width: 600px) { .coin-grid { grid-template-columns: repeat(3, 1fr); } }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 头部 -->
         <div class="header">
-            <div class="logo">💜 爱心区块银行<br><small style="font-size:14px;color:#94a3b8;">Love Block Bank</small></div>
-            <button class="connect-btn" id="connectWalletBtn">连接钱包</button>
+            <div class="logo">💜 Love Block Bank</div>
+            <button class="connect-btn" id="connectBtn">连接钱包</button>
         </div>
-        
-        <!-- 滚动公告 - 合规版 -->
+
         <div class="announcement" id="announcement">
             📊 节点 #0002 获 V4 贡献认证（持币45天+直推12人） 🔄 社区累计互助分配 12.5 BNB 🛡️ 所有资金链上可验，规则写死不可篡改
         </div>
-        
-        <!-- 节点总数 -->
-        <div class="total-nodes">
+
+        <div class="stat-card">
             <h2>社区节点总数</h2>
-            <div class="number" id="totalNodes">0</div>
+            <div class="number" id="totalNodes">--</div>
         </div>
-        
-        <!-- 币种选择 -->
-        <div class="coin-selector">
-            <div class="coin-btn" data-coin="1" title="BTCB">
-                <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.svg" alt="BTCB">
-                <div>BTCB</div>
-            </div>
-            <div class="coin-btn" data-coin="2" title="ETH">
-                <img src="https://cryptologos.cc/logos/ethereum-eth-logo.svg" alt="ETH">
-                <div>ETH</div>
-            </div>
-            <div class="coin-btn active" data-coin="3" title="BNB">
-                <img src="https://cryptologos.cc/logos/bnb-bnb-logo.svg" alt="BNB">
-                <div>BNB</div>
-            </div>
-            <div class="coin-btn" data-coin="4" title="SOL">
-                <img src="https://cryptologos.cc/logos/solana-sol-logo.svg" alt="SOL">
-                <div>SOL</div>
-            </div>
-            <div class="coin-btn" data-coin="5" title="PAXG">
-                <span style="font-size:24px;">🥇</span>
-                <div>PAXG</div>
+
+        <div class="coin-grid">
+            <div class="coin-btn active" data-type="3"><img src="https://cryptologos.cc/logos/bnb-bnb-logo.svg" alt="BNB"><div>BNB</div></div>
+            <div class="coin-btn" data-type="1"><img src="https://cryptologos.cc/logos/bitcoin-btc-logo.svg" alt="BTCB"><div>BTCB</div></div>
+            <div class="coin-btn" data-type="2"><img src="https://cryptologos.cc/logos/ethereum-eth-logo.svg" alt="ETH"><div>ETH</div></div>
+            <div class="coin-btn" data-type="4"><img src="https://cryptologos.cc/logos/solana-sol-logo.svg" alt="SOL"><div>SOL</div></div>
+            <div class="coin-btn" data-type="5"><span style="font-size:24px;">🥇</span><div>PAXG</div></div>
+        </div>
+
+        <div class="action-card">
+            <h3>📥 参与互助 (Participate)</h3>
+            <input type="text" id="referrer" placeholder="推荐人地址 (0x...)">
+            <button class="action-btn" id="approveBtn">1. 授权代币 (Approve)</button>
+            <button class="action-btn" id="participateBtn" disabled>2. 确认参与 (Participate)</button>
+            <div id="lockNotice" style="display:none;margin-top:8px;color:#22c55e;font-size:13px;text-align:center;">
+                ✅ 您已参与当前币种节点，终身不可切换
             </div>
         </div>
-        
-        <!-- 主操作区 -->
-        <div class="main-action">
-            <img src="https://cryptologos.cc/logos/bnb-bnb-logo.svg" style="width:120px;height:120px;border-radius:50%;box-shadow:0 0 30px rgba(251,191,36,0.5);">
-            <div style="margin:20px 0;">
-                <button class="invest-btn" id="investBtn">投入 1.0 BNB</button>
-            </div>
-            <div class="wallet-balance">
-                钱包余额(BNB): <span id="walletBalance">0.0000</span>
-            </div>
-            <div style="margin-top:20px;">
-                <input type="text" class="referrer-input" id="referrerInput" placeholder="分享人地址 (0x...)">
-            </div>
-            <div id="userInvestedNotice" style="display:none;margin-top:10px;color:#22c55e;font-weight:600;">
-                ✅ 您已参与 BNB 节点，终身不可切换币种
-            </div>
+
+        <div class="pool-grid">
+            <div class="pool-item"><h4>公共生态池</h4><div class="val" id="publicPool">--</div></div>
+            <div class="pool-item"><h4>早期共建池 (1%)</h4><div class="val" id="builderPool">--</div></div>
         </div>
-        
-        <!-- 资金流向看板 - 公开透明 -->
-        <div class="fund-pool-card">
-            <h3>📊 链上资金流向看板（实时同步）</h3>
-            <div class="pool-item">
-                <span>公共生态池（未分配余数）:</span>
-                <span id="publicEcoPool">0.00 BNB</span>
-            </div>
-            <div class="pool-item">
-                <span>早期共建池（1%流水）:</span>
-                <span id="builderPool">0.00 BNB</span>
-            </div>
-            <div style="margin-top:10px;font-size:12px;color:#94a3b8;">
-                *数据来自合约 public 变量，任何钱包均可独立验证
-            </div>
-        </div>
-        
-        <!-- 创世V4分配状态 -->
-        <div class="genesis-v4-status">
-            <h3>🔑 创世V4分配状态</h3>
-            <div>额度：<span id="v4Allocated">0</span> / 10（硬编码封顶）</div>
-            <div style="margin-top:8px;font-size:13px;color:#94a3b8;">
-                说明：仅初始30位股东地址可分配，10席发完功能永久失效。链上事件可查。
-            </div>
-        </div>
-        
-        <!-- 个人资料 -->
-        <div class="profile-card">
+
+        <div class="action-card">
             <h3>👤 个人资料</h3>
-            <div class="profile-item">
-                <span>我的节点</span>
-                <span id="myNode">未入金</span>
-            </div>
-            <div class="profile-item">
-                <span>当前特权等级</span>
-                <span id="currentLevel">V0</span>
-            </div>
-            <div class="profile-item">
-                <span>邀请节点（个）</span>
-                <span id="inviteCount">0</span>
-            </div>
-            <div class="profile-item">
-                <span>累计提现次数</span>
-                <span id="withdrawCount">0 次</span>
-            </div>
-            <div class="profile-item">
-                <span>我的专属推广链接</span>
-                <span id="myRefLink" style="word-break:break-all;">请先完成入金</span>
-            </div>
+            <div class="profile-item"><span>我的节点</span><span id="myNode">未参与</span></div>
+            <div class="profile-item"><span>当前等级</span><span id="myLevel">V0</span></div>
+            <div class="profile-item"><span>直推人数</span><span id="directCount">0</span></div>
+            <div class="profile-item"><span>推广链接</span><span id="refLink" style="word-break:break-all;color:#8b5cf6;">连接后生成</span></div>
         </div>
-        
-        <!-- 我的脉络 -->
-        <div class="profile-card">
-            <h3>🌳 我的脉络</h3>
-            <div class="profile-item">
-                <span>推荐我的人</span>
-                <span id="myReferrer">连接钱包后查看...</span>
-            </div>
-            <div class="profile-item">
-                <span>我推荐的人 (直间推)</span>
-                <span id="myDirects">连接钱包后查看...</span>
-            </div>
+
+        <div class="action-card">
+            <h3>💸 提现 (Withdraw)</h3>
+            <select id="withdrawToken">
+                <option value="3">BNB</option><option value="1">BTCB</option><option value="2">ETH</option><option value="4">SOL</option><option value="5">PAXG</option>
+            </select>
+            <input type="text" id="withdrawAmt" placeholder="提现数量 (单位: Wei 或带小数如 0.5)">
+            <button class="action-btn" id="withdrawBtn">确认提现 (70%到账 / 30%回流社区)</button>
         </div>
-        
-        <!-- 等级路线 -->
-        <div class="level-route">
-            <h3>🏆 身份勋章与等级路线</h3>
-            <div class="level-item">
-                <span>🌱</span>
-                <div>
-                    <strong>V0 - 初级节点</strong><br>
-                    <small style="color:#94a3b8;">初始状态</small>
-                </div>
-            </div>
-            <div class="level-item">
-                <span>🌿</span>
-                <div>
-                    <strong>V1 - 初级布道者</strong><br>
-                    <small style="color:#94a3b8;">直推10个节点</small>
-                </div>
-            </div>
-            <div class="level-item">
-                <span>🌳</span>
-                <div>
-                    <strong>V2 - 高级布道者</strong><br>
-                    <small style="color:#94a3b8;">含2个V1线</small>
-                </div>
-            </div>
-            <div class="level-item">
-                <span>🌲</span>
-                <div>
-                    <strong>V3 - 联合创始人</strong><br>
-                    <small style="color:#94a3b8;">含2个V2线</small>
-                </div>
-            </div>
-            <div class="level-item">
-                <span>👑</span>
-                <div>
-                    <strong>V4 - 联合创始人</strong><br>
-                    <small style="color:#94a3b8;">含3个V3线 + 持币时间</small>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 开发者选项 - 测试期显示，主网隐藏 -->
+
         <div class="dev-panel" id="devPanel">
-            <h3>⚠️ 开发者选项 / 测试期调试用</h3>
-            <div style="margin-bottom:15px;">
-                <label style="display:block;margin-bottom:5px;">目标用户地址:</label>
-                <input type="text" id="devTargetAddress" style="width:100%;padding:8px;border-radius:4px;border:1px solid #475569;background:rgba(255,255,255,0.1);color:white;">
-            </div>
-            <div style="margin-bottom:15px;">
-                <label style="display:block;margin-bottom:5px;">提升至特权等级:</label>
-                <select id="devTargetLevel" style="width:100%;padding:8px;border-radius:4px;border:1px solid #475569;background:rgba(255,255,255,0.1);color:white;">
-                    <option value="1">V1 节点</option>
-                    <option value="2">V2 初级布道者</option>
-                    <option value="3">V3 高级合伙人</option>
-                    <option value="4">V4 联合创始人</option>
-                </select>
-            </div>
-            <button class="connect-btn" style="background:#ef4444;" id="devUpgradeBtn">执行特权升级（仅测试期）</button>
-            <div style="margin-top:10px;font-size:12px;color:#94a3b8;">
-                注意：主网上线后此功能将隐藏，仅保留合约自动升级逻辑
-            </div>
+            <h3 style="color:#ef4444;margin-bottom:10px;">⚠️ 开发者选项 (测试期)</h3>
+            <input type="text" id="devTarget" placeholder="目标地址 (0x...)">
+            <select id="devLevel"><option value="1">V1</option><option value="2">V2</option><option value="3">V3</option><option value="4">V4</option></select>
+            <button class="action-btn" style="background:#ef4444;" id="devUpgradeBtn">执行特权升级</button>
         </div>
-        
-        <!-- 底部声明 -->
-        <div class="footer-declaration">
-            <strong>*提现规则:</strong> 70%到账您的钱包，剩余30%分配给全网上下公排节点与生态<br>
-            <small>© 2026 Love Block Bank. 所有资金链上可验，规则写死不可篡改</small>
-        </div>
+
+        <div class="log-box" id="log">📜 操作日志将显示在此处...</div>
+        <div class="footer">© 2026 Love Block Bank | 链上可验 · 规则写死 · 囤币共识</div>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+
     <script>
-        // ⚠️ 部署后替换此处
-        const CONTRACT_ADDRESS = "YOUR_CONTRACT_ADDRESS_HERE";
-        const CONTRACT_ABI = [ /* 粘贴ABI */ ];
-        
-        // 配置：主网设为 false，测试期设为 true
-        const IS_TESTNET = true; // ⚠️ 主网上线后改为 false
-        
-        let provider, signer, contract;
-        let currentUser = null;
-        let selectedCoin = 3; // 默认BNB
-        
-        // 初始化
-        document.getElementById('connectWalletBtn').addEventListener('click', async () => {
-            if (typeof window.ethereum !== 'undefined') {
-                try {
-                    await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    provider = new ethers.providers.Web3Provider(window.ethereum);
-                    signer = provider.getSigner();
-                    currentUser = await signer.getAddress();
-                    
-                    document.getElementById('connectWalletBtn').textContent = currentUser.slice(0,6)+'...'+currentUser.slice(-4);
-                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-                    
-                    await loadUserData();
-                    await loadPoolData();
-                } catch (error) {
-                    console.error('连接钱包失败:', error);
-                }
-            } else {
-                alert('请安装 MetaMask 钱包');
-            }
-        });
-        
-        // 加载用户数据
-        async function loadUserData() {
-            if (!contract || !currentUser) return;
-            
-            try {
-                const userInfo = await contract.userInfo(currentUser);
-                document.getElementById('myNode').textContent = userInfo.isJoined ? `#${userInfo.id}` : '未入金';
-                document.getElementById('currentLevel').textContent = `V${userInfo.classLevel}`;
-                
-                const userInvestedType = await contract.userInvestedTokenType(currentUser);
-                if (userInvestedType > 0) {
-                    document.getElementById('userInvestedNotice').style.display = 'block';
-                    document.getElementById('investBtn').disabled = true;
-                    document.getElementById('investBtn').textContent = '已参与（终身锁定）';
-                }
-            } catch (error) {
-                console.error('加载用户数据失败:', error);
-            }
-        }
-        
-        // 加载资金池数据
-        async function loadPoolData() {
-            if (!contract) return;
-            
-            try {
-                const publicPool = await contract.publicEcoPoolLocked(3); // BNB
-                const builderPool = await contract.builderPoolLocked(3);
-                
-                document.getElementById('publicEcoPool').textContent = `${ethers.utils.formatEther(publicPool)} BNB`;
-                document.getElementById('builderPool').textContent = `${ethers.utils.formatEther(builderPool)} BNB`;
-                
-                const v4Allocated = await contract.shareholderV4Allocated();
-                document.getElementById('v4Allocated').textContent = v4Allocated.toString();
-                
-                const totalCount = await contract.totalCount();
-                document.getElementById('totalNodes').textContent = totalCount.toString();
-            } catch (error) {
-                console.error('加载池数据失败:', error);
-            }
-        }
-        
-        // 测试期显示开发者面板
-        if (IS_TESTNET) {
-            document.getElementById('devPanel').classList.add('show');
-        }
-        
-        // 币种选择
+        // ⚠️ 你的测试网合约地址
+        const CONTRACT_ADDRESS = "0xd40b700e44603591f5e0fb2b89d646f2dc423d57";
+        const IS_TESTNET = true; // 主网上线改为 false
+
+        // ⚠️ 第 1 步：去 Remix 右侧复制完整 ABI，粘贴替换下方数组
+        const CONTRACT_ABI = [
+            "function participate(address _referrer, uint8 _tokenType) external",
+            "function withdraw(uint8 _targetTokenType, uint256 _requestAmt) external",
+            "function userInfo(address) view returns (bool isJoined, address referrer, uint256 classLevel, uint256 id, uint256 joinTime, uint256[] memory withdrawTimes)",
+            "function userInvestedTokenType(address) view returns (uint8)",
+            "function totalCount() view returns (uint256)",
+            "function publicEcoPoolLocked(uint8) view returns (uint256)",
+            "function builderPoolLocked(uint8) view returns (uint256)",
+            "function userDirects(address) view returns (address[] memory)",
+            "function approve(address spender, uint256 amount) external returns (bool)",
+            "function balanceOf(address) view returns (uint256)",
+            "function decimals() view returns (uint8)"
+        ];
+
+        // 测试网代币合约地址 (请确保与你部署时传入的一致)
+        const TOKENS = {
+            1: "0x6ce8dA28E2f864420840cF74474eFf5fD80E65B8",
+            2: "0xd66c6B4F0be8CE5b39D52E0Fd1344c389929B378",
+            3: "0x337610d27c682E347C9cD60BD4b3b107C9d34dDd",
+            4: "0x7ef95a0FEE0Dd31b22626fA2e10Ee6A223F8a684",
+            5: "0x6ce8dA28E2f864420840cF74474eFf5fD80E65B8"
+        };
+
+        let provider, signer, contract, tokenContract;
+        let selectedType = 3;
+        const log = msg => document.getElementById('log').innerHTML = `<div>${new Date().toLocaleTimeString()} ${msg}</div>` + document.getElementById('log').innerHTML;
+
         document.querySelectorAll('.coin-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.onclick = () => {
                 document.querySelectorAll('.coin-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                selectedCoin = parseInt(btn.dataset.coin);
-            });
+                selectedType = parseInt(btn.dataset.type);
+            };
         });
+
+        document.getElementById('connectBtn').onclick = async () => {
+            if (!window.ethereum) return log("❌ 未检测到 MetaMask");
+            try {
+                await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x61' }] });
+            } catch(e) { return log("⚠️ 请手动切换至 BSC Testnet (ChainID: 97)"); }
+
+            provider = new ethers.providers.Web3Provider(window.ethereum);
+            signer = provider.getSigner();
+            contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
+            const addr = await signer.getAddress();
+            document.getElementById('connectBtn').textContent = addr.slice(0,6)+'...'+addr.slice(-4);
+            document.getElementById('refLink').textContent = `?ref=${addr}`;
+            log("✅ 钱包已连接");
+
+            await refreshData();
+        };
+
+        async function refreshData() {
+            if (!contract) return;
+            try {
+                const addr = await signer.getAddress();
+                const [total, publicP, builderP] = await Promise.all([
+                    contract.totalCount(),
+                    contract.publicEcoPoolLocked(3),
+                    contract.builderPoolLocked(3)
+                ]);
+                document.getElementById('totalNodes').textContent = total.toString();
+                document.getElementById('publicPool').textContent = ethers.utils.formatEther(publicP) + " BNB";
+                document.getElementById('builderPool').textContent = ethers.utils.formatEther(builderP) + " BNB";
+
+                const info = await contract.userInfo(addr);
+                document.getElementById('myNode').textContent = info.isJoined ? `#${info.id}` : "未参与";
+                document.getElementById('myLevel').textContent = `V${info.classLevel}`;
+                
+                const investedType = await contract.userInvestedTokenType(addr);
+                if (investedType > 0) {
+                    document.getElementById('lockNotice').style.display = 'block';
+                    document.getElementById('participateBtn').disabled = true;
+                    document.getElementById('participateBtn').textContent = '已参与（终身锁定）';
+                }
+
+                const directs = await contract.userDirects(addr);
+                document.getElementById('directCount').textContent = directs.length;
+            } catch (err) { log("❌ 数据刷新失败: " + err.reason); }
+        }
+
+        document.getElementById('approveBtn').onclick = async () => {
+            if (!contract) return log("⚠️ 请先连接钱包");
+            tokenContract = new ethers.Contract(TOKENS[selectedType], ["function approve(address,uint256) external returns (bool)", "function decimals() view returns (uint8)"], signer);
+            try {
+                log(`⏳ 正在授权 Type ${selectedType} 代币...`);
+                const tx = await tokenContract.approve(CONTRACT_ADDRESS, ethers.constants.MaxUint256);
+                await tx.wait();
+                log("✅ 授权成功！");
+                document.getElementById('participateBtn').disabled = false;
+            } catch (err) { log("❌ 授权失败: " + err.reason); }
+        };
+
+        document.getElementById('participateBtn').onclick = async () => {
+            if (!contract) return log("⚠️ 请先连接钱包");
+            const ref = document.getElementById('referrer').value;
+            if (!ethers.utils.isAddress(ref)) return log("❌ 推荐人地址格式错误");
+            try {
+                log(`⏳ 正在参与 Type ${selectedType}...`);
+                const tx = await contract.participate(ref, selectedType);
+                await tx.wait();
+                log("✅ 参与成功！请刷新页面查看状态");
+                await refreshData();
+            } catch (err) { log("❌ 参与失败: " + err.reason); }
+        };
+
+        document.getElementById('withdrawBtn').onclick = async () => {
+            if (!contract) return log("⚠️ 请先连接钱包");
+            const type = parseInt(document.getElementById('withdrawToken').value);
+            const amt = document.getElementById('withdrawAmt').value;
+            if (!amt || isNaN(amt)) return log("❌ 请输入有效数量");
+            try {
+                log(`⏳ 正在提现 Type ${type}...`);
+                // 支持小数输入自动转Wei
+                const tokenDec = await new ethers.Contract(TOKENS[type], ["function decimals() view returns (uint8)"], provider).decimals();
+                const parsedAmt = ethers.utils.parseUnits(amt, tokenDec);
+                const tx = await contract.withdraw(type, parsedAmt);
+                await tx.wait();
+                log("✅ 提现交易已上链！");
+                await refreshData();
+            } catch (err) { log("❌ 提现失败: " + err.reason); }
+        };
+
+        if (IS_TESTNET) document.getElementById('devPanel').classList.add('show');
+        document.getElementById('devUpgradeBtn').onclick = async () => {
+            // 测试期简易调用示例，实际请走合约 allocateShareholderV4
+            log("⚠️ 测试期开发者功能：请通过 Remix 或区块浏览器调用合约函数");
+        };
     </script>
 </body>
 </html>

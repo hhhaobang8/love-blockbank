@@ -4,247 +4,1304 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Love Block Bank - 爱心区块银行</title>
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #e2e8f0; min-height: 100vh; }
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 16px; }
-        .logo { font-size: 20px; font-weight: 700; color: #fbbf24; }
-        .connect-btn { background: #8b5cf6; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s; }
-        .connect-btn:hover { background: #7c3aed; }
-        .announcement { background: rgba(251, 191, 36, 0.15); border-left: 4px solid #fbbf24; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; line-height: 1.5; }
-        .stat-card { text-align: center; padding: 24px; background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 16px; }
-        .stat-card h2 { font-size: 16px; color: #94a3b8; margin-bottom: 8px; }
-        .stat-card .number { font-size: 48px; font-weight: 800; color: #fbbf24; }
-        .coin-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
-        .coin-btn { background: rgba(255,255,255,0.05); border: 2px solid transparent; border-radius: 10px; padding: 12px 0; text-align: center; cursor: pointer; transition: 0.2s; }
-        .coin-btn.active { border-color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
-        .coin-btn img { width: 32px; height: 32px; margin-bottom: 4px; }
-        .coin-btn div { font-size: 12px; font-weight: 600; }
-        .action-card { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
-        .action-card h3 { margin-bottom: 12px; color: #fbbf24; }
-        input, select, button.action-btn { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 14px; }
-        button.action-btn { background: #8b5cf6; border: none; cursor: pointer; font-weight: 600; }
-        button.action-btn:disabled { background: #475569; cursor: not-allowed; }
-        .pool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-        .pool-item { background: rgba(34, 197, 94, 0.1); border: 1px solid #22c55e; border-radius: 8px; padding: 12px; text-align: center; }
-        .pool-item h4 { font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
-        .pool-item .val { font-size: 18px; font-weight: 700; color: #22c55e; }
-        .profile-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #334155; font-size: 14px; }
-        .profile-item:last-child { border-bottom: none; }
-        .level-route { display: flex; gap: 8px; margin-top: 12px; overflow-x: auto; padding-bottom: 8px; }
-        .level-step { flex: 1; min-width: 100px; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 10px; text-align: center; font-size: 12px; }
-        .level-step.active { background: rgba(251, 191, 36, 0.2); border: 1px solid #fbbf24; }
-        .dev-panel { background: rgba(239, 68, 68, 0.1); border: 2px dashed #ef4444; border-radius: 12px; padding: 16px; margin-bottom: 16px; display: none; }
-        .dev-panel.show { display: block; }
-        .log-box { background: #020617; border-radius: 8px; padding: 12px; font-family: monospace; font-size: 12px; max-height: 120px; overflow-y: auto; margin-top: 16px; color: #94a3b8; }
-        .footer { text-align: center; font-size: 12px; color: #64748b; margin-top: 24px; padding-top: 16px; border-top: 1px solid #334155; }
-        @media (max-width: 600px) { .coin-grid { grid-template-columns: repeat(3, 1fr); } }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0214;
+            color: #e2e8f0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        /* 动态粒子背景 */
+        #particles {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+            z-index: -2;
+        }
+        #particles::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, rgba(187,57,181,0.8), transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(59,130,246,0.6), transparent),
+                radial-gradient(1px 1px at 90px 40px, rgba(251,191,36,0.9), transparent);
+            background-size: 100px 100px;
+            animation: float 20s linear infinite;
+        }
+        @keyframes float { 0% { transform: translateY(0); } 100% { transform: translateY(-100px); } }
+        
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
+        
+        /* 头部 */
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 20px; background: rgba(26,8,34,0.8); border-radius: 16px;
+            border: 1px solid rgba(255,0,255,0.3); margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; color: #ff00ff; }
+        .logo img { width: 36px; height: 36px; border-radius: 50%; }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .lang-switch {
+            background: rgba(255,255,255,0.1); border: 1px solid #ff00ff;
+            color: #fff; padding: 6px 12px; border-radius: 8px; cursor: pointer;
+            font-size: 13px; outline: none;
+        }
+        .connect-btn {
+            background: linear-gradient(135deg, #ff00ff, #af00ff);
+            color: white; border: none; padding: 10px 20px; border-radius: 12px;
+            cursor: pointer; font-weight: 600; transition: 0.3s;
+        }
+        .connect-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,0,255,0.4); }
+        
+        /* 滚动公告 */
+        .announcement {
+            background: rgba(251,191,36,0.15); border-left: 4px solid #fbbf24;
+            padding: 10px 16px; border-radius: 8px; margin-bottom: 20px;
+            font-size: 13px; color: #ffd700; overflow: hidden;
+        }
+        .marquee { display: inline-block; padding-left: 100%; animation: scroll 30s linear infinite; }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        
+        /* 节点总数 */
+        .total-card {
+            text-align: center; padding: 24px; background: rgba(26,8,34,0.6);
+            border-radius: 16px; border: 1px solid rgba(255,215,0,0.3); margin-bottom: 20px;
+        }
+        .total-card h2 { font-size: 15px; color: #94a3b8; margin-bottom: 8px; }
+        .total-card .number {
+            font-size: 56px; font-weight: 800; color: #ffd700;
+            text-shadow: 0 0 20px rgba(255,215,0,0.6);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.8; } }
+        
+        /* 币种切换 */
+        .coin-tabs {
+            display: flex; justify-content: center; gap: 12px; margin: 20px 0; flex-wrap: wrap;
+        }
+        .coin-tab {
+            background: rgba(255,255,255,0.08); border: 2px solid transparent;
+            border-radius: 14px; padding: 12px 16px; cursor: pointer;
+            transition: 0.3s; display: flex; flex-direction: column; align-items: center;
+            width: 72px; opacity: 0.6;
+        }
+        .coin-tab.active {
+            border-color: #ff00ff; background: rgba(255,0,255,0.15);
+            opacity: 1; transform: scale(1.05);
+        }
+        .coin-tab img { width: 36px; height: 36px; border-radius: 50%; margin-bottom: 6px; background: #fff; padding: 2px; }
+        .coin-tab span { font-size: 12px; font-weight: 600; }
+        
+        /* 主操作区 */
+        .main-action {
+            text-align: center; padding: 30px 20px; background: rgba(26,8,34,0.6);
+            border-radius: 20px; border: 1px solid rgba(255,0,255,0.3); margin: 25px 0;
+        }
+        .main-coin {
+            width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 20px;
+            background: linear-gradient(135deg, #1a0822, #2a1135);
+            border: 3px solid #ff00ff; box-shadow: 0 0 30px rgba(255,0,255,0.4);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .main-coin img { width: 70px; height: 70px; border-radius: 50%; }
+        .action-btn {
+            background: linear-gradient(135deg, #ff00ff, #af00ff);
+            color: white; border: none; padding: 14px 40px; border-radius: 14px;
+            font-size: 17px; font-weight: 700; cursor: pointer; margin: 15px 0;
+            transition: 0.3s; width: 100%; max-width: 320px;
+        }
+        .action-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(255,0,255,0.5); }
+        .action-btn:disabled { background: #475569; cursor: not-allowed; transform: none; }
+        .balance { color: #94a3b8; margin: 10px 0; font-size: 14px; }
+        .referrer-input {
+            width: 100%; max-width: 400px; padding: 12px 16px; border-radius: 10px;
+            border: 1px solid #475569; background: rgba(255,255,255,0.08);
+            color: white; margin: 15px 0; font-size: 14px;
+        }
+        .lock-notice {
+            display: none; margin-top: 12px; color: #22c55e; font-weight: 600; font-size: 13px;
+        }
+        
+        /* 卡片通用样式 */
+        .card {
+            background: rgba(26,8,34,0.6); border-radius: 16px; padding: 20px;
+            margin-bottom: 20px; border: 1px solid rgba(255,0,255,0.2);
+        }
+        .card-title {
+            font-size: 16px; font-weight: 700; color: #ff00ff; margin-bottom: 16px;
+            display: flex; align-items: center; gap: 8px; cursor: pointer;
+        }
+        .card-title::after { content: '▼'; font-size: 12px; color: #64748b; transition: 0.3s; }
+        .card.collapsed .card-title::after { transform: rotate(-90deg); }
+        .card.collapsed > *:not(.card-title) { display: none; }
+        
+        /* 个人资料网格 */
+        .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .profile-item {
+            background: rgba(255,255,255,0.05); border-radius: 10px; padding: 12px;
+            text-align: center;
+        }
+        .profile-item.full { grid-column: 1 / -1; }
+        .profile-label { font-size: 12px; color: #94a3b8; margin-bottom: 6px; }
+        .profile-value {
+            font-size: 15px; font-weight: 700; color: #fff;
+            word-break: break-all;
+        }
+        .profile-value.clickable { cursor: pointer; color: #8b5cf6; }
+        .profile-value.clickable:hover { text-decoration: underline; }
+        
+        /* 人脉网络 */
+        .network-list {
+            background: rgba(255,255,255,0.05); border-radius: 10px;
+            padding: 12px; max-height: 200px; overflow-y: auto; font-size: 13px;
+        }
+        .network-item {
+            padding: 8px 0; border-bottom: 1px dashed rgba(255,255,255,0.1);
+        }
+        .network-item:last-child { border-bottom: none; }
+        .network-addr { color: #00ffff; font-family: monospace; }
+        .network-meta { color: #94a3b8; font-size: 11px; margin-top: 4px; }
+        .copy-btn {
+            background: none; border: none; color: #00ffff; cursor: pointer;
+            font-size: 14px; margin-left: 6px; padding: 0 4px;
+        }
+        
+        /* 资金池看板 */
+        .pool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .pool-item {
+            background: rgba(34,197,94,0.15); border: 1px solid #22c55e;
+            border-radius: 10px; padding: 14px; text-align: center;
+        }
+        .pool-label { font-size: 12px; color: #94a3b8; margin-bottom: 6px; }
+        .pool-value { font-size: 18px; font-weight: 700; color: #22c55e; font-family: monospace; }
+        
+        /* 多签治理面板 */
+        .msig-panel {
+            background: rgba(0,128,128,0.15); border: 2px solid #00ffff;
+            border-radius: 16px; padding: 20px; margin: 20px 0;
+        }
+        .msig-section { margin-bottom: 20px; }
+        .msig-title {
+            font-size: 14px; font-weight: 700; color: #00ffff; margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .msig-input {
+            width: 100%; padding: 10px; margin: 8px 0; border-radius: 8px;
+            border: 1px solid #475569; background: rgba(255,255,255,0.08);
+            color: white; font-size: 13px;
+        }
+        .msig-btn {
+            width: 100%; padding: 12px; background: #008080; color: white;
+            border: none; border-radius: 8px; cursor: pointer; font-weight: 600;
+            margin-top: 10px; transition: 0.3s;
+        }
+        .msig-btn:hover { background: #00a3a3; }
+        .msig-list {
+            max-height: 250px; overflow-y: auto; font-size: 12px;
+            background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px;
+        }
+        .msig-item {
+            padding: 10px; margin-bottom: 8px; border-radius: 8px;
+            background: rgba(255,255,255,0.05); border-left: 3px solid #ffa500;
+        }
+        .msig-item.executed { border-left-color: #22c55e; }
+        .msig-status { font-size: 11px; color: #ffa500; font-weight: 600; }
+        .msig-item.executed .msig-status { color: #22c55e; }
+        
+        /* 等级路线 */
+        .level-route {
+            display: flex; justify-content: space-around; margin: 20px 0; flex-wrap: wrap;
+        }
+        .level-step {
+            width: 18%; min-width: 80px; text-align: center; padding: 12px 8px;
+            background: rgba(255,255,255,0.08); border-radius: 12px;
+            transition: 0.3s; opacity: 0.3;
+        }
+        .level-step.active {
+            opacity: 1; background: rgba(251,191,36,0.2);
+            border: 2px solid #fbbf24; transform: scale(1.05);
+        }
+        .level-step img { width: 32px; height: 32px; border-radius: 50%; margin-bottom: 6px; background: #fff; padding: 2px; }
+        .level-step .lvl { font-size: 14px; font-weight: 700; color: #fff; }
+        .level-step .desc { font-size: 10px; color: #94a3b8; margin-top: 4px; }
+        
+        /* 奖励卡片 */
+        .reward-card {
+            background: rgba(26,8,34,0.6); border: 1px solid #ff00ff;
+            border-radius: 14px; padding: 16px; margin-bottom: 15px;
+        }
+        .reward-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 12px;
+        }
+        .reward-header-left { display: flex; align-items: center; gap: 10px; }
+        .reward-header-left img { width: 32px; height: 32px; border-radius: 50%; background: #fff; padding: 2px; }
+        .reward-header-left span { font-weight: 700; font-size: 16px; }
+        .reward-status { font-size: 12px; font-weight: 600; }
+        .reward-status.withdrawable { color: #22c55e; }
+        .reward-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+        .reward-stat { text-align: center; }
+        .reward-stat-title { font-size: 11px; color: #94a3b8; margin-bottom: 4px; }
+        .reward-stat-value { font-size: 14px; font-weight: 700; color: #fff; font-family: monospace; }
+        .reward-total {
+            display: flex; justify-content: space-between; padding-top: 12px;
+            border-top: 1px dashed rgba(255,0,255,0.3); margin-top: 12px;
+            font-size: 14px;
+        }
+        .reward-total span:last-child { color: #ff00ff; font-weight: 700; }
+        .reward-actions { display: flex; gap: 10px; margin-top: 12px; }
+        .reward-btn {
+            flex: 1; padding: 10px; border-radius: 8px; border: none;
+            font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.3s;
+        }
+        .reward-btn.join { background: #ff00ff; color: white; }
+        .reward-btn.withdraw { background: #690968; color: white; }
+        .reward-btn:disabled { background: #475569; cursor: not-allowed; }
+        
+        /* 日志框 */
+        .log-box {
+            background: rgba(2,6,23,0.8); border-radius: 10px; padding: 12px;
+            font-family: monospace; font-size: 12px; max-height: 120px;
+            overflow-y: auto; color: #94a3b8; margin-top: 20px;
+        }
+        
+        /* 页脚 */
+        .footer {
+            text-align: center; padding: 30px 20px 20px; color: #64748b;
+            font-size: 12px; border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 30px;
+        }
+        .footer a { color: #8b5cf6; text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+        .admin-toggle {
+            position: fixed; right: 20px; bottom: 20px; width: 48px; height: 48px;
+            background: rgba(255,215,0,0.2); border: 2px solid #ffd700;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 24px; cursor: pointer; z-index: 100;
+            transition: 0.3s;
+        }
+        .admin-toggle:hover { transform: scale(1.1); background: rgba(255,215,0,0.4); }
+        
+        /* 响应式 */
+        @media (max-width: 600px) {
+            .profile-grid, .pool-grid, .reward-stats { grid-template-columns: 1fr; }
+            .coin-tabs { gap: 8px; }
+            .coin-tab { width: 60px; padding: 10px 8px; }
+            .level-step { width: 19%; min-width: 60px; padding: 10px 4px; }
+            .level-step img { width: 28px; height: 28px; }
+        }
     </style>
 </head>
 <body>
+    <div id="particles"></div>
+    
     <div class="container">
-        <div class="header">
-            <div class="logo">💜 Love Block Bank</div>
-            <button class="connect-btn" id="connectBtn">连接钱包</button>
-        </div>
+        <!-- 头部 -->
+        <header>
+            <div class="logo">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ff00ff'/%3E%3Cstop offset='100%25' stop-color='%23690968'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M50 20 C30 20, 15 35, 15 50 C15 70, 35 85, 50 95 C65 85, 85 70, 85 50 C85 35, 70 20, 50 20 Z' fill='url(%23g)'/%3E%3C/svg%3E" alt="Logo">
+                <div>Love Block Bank<br><span style="font-size:11px;color:#a44bbb">爱心区块银行</span></div>
+            </div>
+            <div class="header-right">
+                <select id="langSwitcher" class="lang-switch" onchange="changeLanguage(this.value)">
+                    <option value="zh-CN">简体</option>
+                    <option value="zh-TW">繁體</option>
+                    <option value="en">EN</option>
+                </select>
+                <button class="connect-btn" id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+            </div>
+        </header>
 
-        <div class="announcement" id="announcement">
-            📊 节点 #0002 获 V4 贡献认证（持币45天+直推12人） 🔄 社区累计互助分配 12.5 BNB 🛡️ 所有资金链上可验，规则写死不可篡改
-        </div>
-
-        <div class="stat-card">
-            <h2>社区节点总数</h2>
-            <div class="number" id="totalNodes">--</div>
-        </div>
-
-        <div class="coin-grid">
-            <div class="coin-btn active" data-type="3"><img src="https://cryptologos.cc/logos/bnb-bnb-logo.svg" alt="BNB"><div>BNB</div></div>
-            <div class="coin-btn" data-type="1"><img src="https://cryptologos.cc/logos/bitcoin-btc-logo.svg" alt="BTCB"><div>BTCB</div></div>
-            <div class="coin-btn" data-type="2"><img src="https://cryptologos.cc/logos/ethereum-eth-logo.svg" alt="ETH"><div>ETH</div></div>
-            <div class="coin-btn" data-type="4"><img src="https://cryptologos.cc/logos/solana-sol-logo.svg" alt="SOL"><div>SOL</div></div>
-            <div class="coin-btn" data-type="5"><span style="font-size:24px;">🥇</span><div>PAXG</div></div>
-        </div>
-
-        <div class="action-card">
-            <h3>📥 参与互助 (Participate)</h3>
-            <input type="text" id="referrer" placeholder="推荐人地址 (0x...)">
-            <button class="action-btn" id="approveBtn">1. 授权代币 (Approve)</button>
-            <button class="action-btn" id="participateBtn" disabled>2. 确认参与 (Participate)</button>
-            <div id="lockNotice" style="display:none;margin-top:8px;color:#22c55e;font-size:13px;text-align:center;">
-                ✅ 您已参与当前币种节点，终身不可切换
+        <!-- 滚动公告 -->
+        <div class="announcement">
+            <div class="marquee" id="scrollingText">
+                🎉 Welcome to Love Block Bank! 🚀 Global nodes booming... 🏆 Node #0002 obtained V4 Genesis Certification! 🏆 Node #0058 obtained V3 Contribution Certification!
             </div>
         </div>
 
-        <div class="pool-grid">
-            <div class="pool-item"><h4>公共生态池</h4><div class="val" id="publicPool">--</div></div>
-            <div class="pool-item"><h4>早期共建池 (1%)</h4><div class="val" id="builderPool">--</div></div>
+        <!-- 节点总数 -->
+        <div class="total-card">
+            <h2 data-i18n="社区节点总数">社区节点总数</h2>
+            <div class="number" id="totalNodes">0</div>
         </div>
 
-        <div class="action-card">
-            <h3>👤 个人资料</h3>
-            <div class="profile-item"><span>我的节点</span><span id="myNode">未参与</span></div>
-            <div class="profile-item"><span>当前等级</span><span id="myLevel">V0</span></div>
-            <div class="profile-item"><span>直推人数</span><span id="directCount">0</span></div>
-            <div class="profile-item"><span>推广链接</span><span id="refLink" style="word-break:break-all;color:#8b5cf6;">连接后生成</span></div>
+        <!-- 币种切换 -->
+        <div class="coin-tabs">
+            <div class="coin-tab" data-type="1" onclick="changeToken(1)">
+                <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.svg" alt="BTCB">
+                <span>BTCB</span>
+            </div>
+            <div class="coin-tab" data-type="2" onclick="changeToken(2)">
+                <img src="https://cryptologos.cc/logos/ethereum-eth-logo.svg" alt="ETH">
+                <span>ETH</span>
+            </div>
+            <div class="coin-tab active" data-type="3" onclick="changeToken(3)">
+                <img src="https://cryptologos.cc/logos/bnb-bnb-logo.svg" alt="BNB">
+                <span>BNB</span>
+            </div>
+            <div class="coin-tab" data-type="4" onclick="changeToken(4)">
+                <img src="https://cryptologos.cc/logos/solana-sol-logo.svg" alt="SOL">
+                <span>SOL</span>
+            </div>
+            <div class="coin-tab" data-type="5" onclick="changeToken(5)">
+                <span style="font-size:24px;">🥇</span>
+                <span>PAXG</span>
+            </div>
         </div>
 
-        <div class="action-card">
-            <h3>💸 提现 (Withdraw)</h3>
-            <select id="withdrawToken">
-                <option value="3">BNB</option><option value="1">BTCB</option><option value="2">ETH</option><option value="4">SOL</option><option value="5">PAXG</option>
-            </select>
-            <input type="text" id="withdrawAmt" placeholder="提现数量 (单位: Wei 或带小数如 0.5)">
-            <button class="action-btn" id="withdrawBtn">确认提现 (70%到账 / 30%回流社区)</button>
+        <!-- 主操作区 -->
+        <div class="main-action">
+            <div class="main-coin">
+                <img id="mainCoinImg" src="https://cryptologos.cc/logos/bnb-bnb-logo.svg" alt="BNB">
+            </div>
+            <button class="action-btn" id="participateBtn" onclick="participate()">
+                <span data-i18n="投入">投入</span> <span id="buyAmount">1.0 BNB</span>
+            </button>
+            <div class="balance">
+                <span data-i18n="钱包余额">钱包余额</span>(<span id="balanceSymbol">BNB</span>): 
+                <span id="balance">0.0000</span>
+            </div>
+            <input type="text" class="referrer-input" id="referrerInput" 
+                   data-i18n-placeholder="请填写分享人地址" placeholder="请填写分享人地址">
+            <div class="lock-notice" id="lockNotice">
+                ✅ <span data-i18n="您已参与，终身不可切换">您已参与，终身不可切换</span>
+            </div>
         </div>
 
-        <div class="dev-panel" id="devPanel">
-            <h3 style="color:#ef4444;margin-bottom:10px;">⚠️ 开发者选项 (测试期)</h3>
-            <input type="text" id="devTarget" placeholder="目标地址 (0x...)">
-            <select id="devLevel"><option value="1">V1</option><option value="2">V2</option><option value="3">V3</option><option value="4">V4</option></select>
-            <button class="action-btn" style="background:#ef4444;" id="devUpgradeBtn">执行特权升级</button>
+        <!-- 个人资料 -->
+        <div class="card">
+            <div class="card-title" data-i18n="个人资料">个人资料</div>
+            <div class="profile-grid">
+                <div class="profile-item">
+                    <div class="profile-label" data-i18n="我的节点">我的节点</div>
+                    <div class="profile-value" id="myNode" data-i18n="未入金">未入金</div>
+                </div>
+                <div class="profile-item">
+                    <div class="profile-label" data-i18n="当前贡献等级">当前贡献等级</div>
+                    <div class="profile-value" id="myLevel">V0</div>
+                </div>
+                <div class="profile-item">
+                    <div class="profile-label" data-i18n="邀请节点（个）">邀请节点（个）</div>
+                    <div class="profile-value" id="directCount">0</div>
+                </div>
+                <div class="profile-item">
+                    <div class="profile-label" data-i18n="累计提现次数">累计提现次数</div>
+                    <div class="profile-value" id="withdrawCount">0 <span data-i18n="次">次</span></div>
+                </div>
+                <div class="profile-item full">
+                    <div class="profile-label" data-i18n="我的专属推广链接">我的专属推广链接</div>
+                    <div class="profile-value clickable" id="refLink" onclick="copyRefLink()" 
+                         data-i18n="请先完成入金">请先完成入金</div>
+                </div>
+            </div>
         </div>
 
-        <div class="log-box" id="log">📜 操作日志将显示在此处...</div>
-        <div class="footer">© 2026 Love Block Bank | 链上可验 · 规则写死 · 囤币共识</div>
+        <!-- 我的脉络 -->
+        <div class="card">
+            <div class="card-title" data-i18n="我的脉络">我的脉络</div>
+            <div style="margin-bottom:12px">
+                <div class="profile-label" data-i18n="推荐我的人">推荐我的人</div>
+                <div class="network-list" id="referrerList">
+                    <div style="color:#94a3b8;text-align:center" data-i18n="连接钱包后查看...">连接钱包后查看...</div>
+                </div>
+            </div>
+            <div>
+                <div class="profile-label" data-i18n="我推荐的人 (直间推)">我推荐的人 (直间推)</div>
+                <div class="network-list" id="directsList">
+                    <div style="color:#94a3b8;text-align:center" data-i18n="连接钱包后查看...">连接钱包后查看...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 资金池看板 -->
+        <div class="card">
+            <div class="card-title" data-i18n="公共生态池 (节点透明数据)">公共生态池 (节点透明数据)</div>
+            <div class="pool-grid">
+                <div class="pool-item">
+                    <div class="pool-label" data-i18n="公共生态池">公共生态池</div>
+                    <div class="pool-value" id="publicPool">-- BNB</div>
+                </div>
+                <div class="pool-item">
+                    <div class="pool-label" data-i18n="早期共建池">早期共建池</div>
+                    <div class="pool-value" id="builderPool">-- BNB</div>
+                </div>
+            </div>
+            <button class="action-btn" style="margin-top:15px;background:#334155" 
+                    onclick="refreshPools()" data-i18n="刷新数据">刷新数据</button>
+        </div>
+
+        <!-- 多签治理面板 (测试期显示) -->
+        <div class="msig-panel" id="msigPanel" style="display:none">
+            <div class="msig-section">
+                <div class="msig-title">
+                    <span data-i18n="生态多签管理 (仅股东/管理员)">生态多签管理 (仅股东/管理员)</span>
+                    <button onclick="loadMsigRequests()" style="background:none;border:1px solid #00ffff;color:#00ffff;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:11px" data-i18n="刷新列表">刷新列表</button>
+                </div>
+                <div style="background:rgba(255,255,255,0.05);padding:12px;border-radius:8px;margin-bottom:15px">
+                    <div style="font-size:12px;font-weight:600;margin-bottom:8px" data-i18n="发起多签提取请求">发起多签提取请求</div>
+                    <select id="msigToken" class="msig-input">
+                        <option value="1">BTCB</option><option value="2">ETH</option>
+                        <option value="3">BNB</option><option value="4">SOL</option><option value="5">PAXG</option>
+                    </select>
+                    <input type="number" id="msigAmount" class="msig-input" data-i18n-placeholder="提取金额" placeholder="提取金额">
+                    <input type="text" id="msigTo" class="msig-input" data-i18n-placeholder="接收地址 (0x...)" placeholder="接收地址 (0x...)">
+                    <select id="msigUsage" class="msig-input">
+                        <option value="1" data-i18n="1=全域社区分红">1=全域社区分红</option>
+                        <option value="2" data-i18n="2=生态空投">2=生态空投</option>
+                        <option value="3" data-i18n="3=市场推广补贴">3=市场推广补贴</option>
+                        <option value="4" data-i18n="4=高阶会员额外奖励">4=高阶会员额外奖励</option>
+                    </select>
+                    <input type="text" id="msigDesc" class="msig-input" data-i18n-placeholder="用途说明" placeholder="用途说明">
+                    <button class="msig-btn" onclick="submitMsigRequest()" data-i18n="提交申请">提交申请</button>
+                </div>
+                <div style="background:rgba(255,255,255,0.05);padding:12px;border-radius:8px">
+                    <div style="font-size:12px;font-weight:600;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+                        <span data-i18n="待处理/历史请求记录">待处理/历史请求记录</span>
+                    </div>
+                    <div class="msig-list" id="msigList">
+                        <div style="text-align:center;color:#94a3b8" data-i18n="加载中...">加载中...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 管理员面板 (测试期) -->
+        <div class="card" id="adminPanel" style="display:none;border:2px solid #ffd700">
+            <div class="card-title" style="color:#ffd700" data-i18n="管理员操作 (测试期)">管理员操作 (测试期)</div>
+            <div style="margin-bottom:12px">
+                <div class="profile-label" data-i18n="目标用户地址">目标用户地址</div>
+                <input type="text" id="adminTarget" class="referrer-input" 
+                       data-i18n-placeholder="输入用户的 0x..." placeholder="输入用户的 0x...">
+            </div>
+            <div style="margin-bottom:12px">
+                <div class="profile-label" data-i18n="变更为贡献等级">变更为贡献等级</div>
+                <select id="adminLevel" class="referrer-input">
+                    <option value="0" data-i18n="取消贡献等级 (降为普通)">取消贡献等级 (降为普通)</option>
+                    <option value="1">V1 <span data-i18n="节点体验">节点体验</span></option>
+                    <option value="2">V2 <span data-i18n="初级布道者">初级布道者</span></option>
+                    <option value="3">V3 <span data-i18n="高级合伙人">高级合伙人</span></option>
+                    <option value="4">V4 <span data-i18n="创世贡献者">创世贡献者</span></option>
+                </select>
+            </div>
+            <button class="action-btn" style="background:linear-gradient(to right,#d4af37,#ffdf00);color:#000" 
+                    onclick="adminSetLevel()" data-i18n="执行贡献等级认证">执行贡献等级认证</button>
+        </div>
+
+        <!-- 等级路线 -->
+        <div class="card">
+            <div class="card-title" data-i18n="身份勋章与等级路线">身份勋章与等级路线</div>
+            <div class="level-route">
+                <div class="level-step active" id="lvl-0">
+                    <img src="https://cryptologos.cc/logos/solana-sol-logo.svg">
+                    <div class="lvl">V0 <span style="font-size:10px;color:#94a3b8">SOL</span></div>
+                    <div class="desc" data-i18n="初级节点">初级节点</div>
+                </div>
+                <div class="level-step" id="lvl-1">
+                    <img src="https://cryptologos.cc/logos/bnb-bnb-logo.svg">
+                    <div class="lvl">V1 <span style="font-size:10px;color:#94a3b8">BNB</span></div>
+                    <div class="desc" data-i18n="直推10个节点">直推10个节点</div>
+                </div>
+                <div class="level-step" id="lvl-2">
+                    <img src="https://cryptologos.cc/logos/ethereum-eth-logo.svg">
+                    <div class="lvl">V2 <span style="font-size:10px;color:#94a3b8">ETH</span></div>
+                    <div class="desc" data-i18n="含2个V1线">含2个V1线</div>
+                </div>
+                <div class="level-step" id="lvl-3">
+                    <span style="font-size:24px">🥇</span>
+                    <div class="lvl">V3 <span style="font-size:10px;color:#94a3b8">PAXG</span></div>
+                    <div class="desc" data-i18n="含2个V2线">含2个V2线</div>
+                </div>
+                <div class="level-step" id="lvl-4">
+                    <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.svg">
+                    <div class="lvl">V4 <span style="font-size:10px;color:#94a3b8">BTCB</span></div>
+                    <div class="desc" data-i18n="含3个V3线">含3个V3线</div>
+                </div>
+            </div>
+            <div style="text-align:center;padding:12px;background:rgba(255,255,255,0.05);border-radius:8px;margin-top:15px">
+                <div id="upgradeHint" style="font-size:13px;color:#ff88ff" 
+                     data-i18n="请先连接钱包并参与入金，解锁您的权限进度。">请先连接钱包并参与入金，解锁您的权限进度。</div>
+            </div>
+        </div>
+
+        <!-- 奖励中心 -->
+        <div class="card">
+            <div class="card-title" data-i18n="全生态分账节点奖励 (多币种全享)">全生态分账节点奖励 (多币种全享)</div>
+            <div id="rewardList">
+                <div style="text-align:center;color:#94a3b8;padding:20px" 
+                     data-i18n="请先连接钱包并参与入金，这里将展示5大生态币种的分润与提现">请先连接钱包并参与入金，这里将展示5大生态币种的分润与提现</div>
+            </div>
+            <div style="text-align:center;font-size:12px;color:#ff88ff;margin-top:15px">
+                *<span data-i18n="提现规则: 70%到账您的钱包，剩余30%分配给全网上下公排节点与生态">提现规则: 70%到账您的钱包，剩余30%分配给全网上下公排节点与生态</span>
+            </div>
+        </div>
+
+        <!-- 日志 -->
+        <div class="log-box" id="logBox">📜 <span data-i18n="操作日志将显示在此处">操作日志将显示在此处</span>...</div>
+
+        <!-- 页脚 -->
+        <div class="footer">
+            © 2026 UnifiedCommunityMutualAid. All Rights Reserved.<br>
+            <span data-i18n="链上可验 · 规则写死 · 囤币共识">链上可验 · 规则写死 · 囤币共识</span>
+        </div>
     </div>
 
-    <script>
-        // ⚠️ 你的测试网合约地址
-        const CONTRACT_ADDRESS = "0xd40b700e44603591f5e0fb2b89d646f2dc423d57";
-        const IS_TESTNET = true; // 主网上线改为 false
+    <!-- 管理员切换按钮 -->
+    <div class="admin-toggle" id="adminToggle" onclick="toggleAdminPanel()" title="管理员面板" style="display:none">👑</div>
 
-        // ⚠️ 第 1 步：去 Remix 右侧复制完整 ABI，粘贴替换下方数组
+    <script>
+        // ================= 配置区 =================
+        // ⚠️ 部署后替换为你的合约地址
+        const CONTRACT_ADDRESS = "0xd40b700e44603591f5e0fb2b89d646f2dc423d57";
+        // 测试期设为 true，主网上线改为 false（自动隐藏管理员面板）
+        const IS_TESTNET = true;
+        
+        // 多语言字典（核心文案）
+        const I18N = {
+            "zh-CN": {},
+            "zh-TW": {},
+            "en": {}
+        };
+        
+        // 币种配置
+        const TOKENS = {
+            1: { name: "BTCB", price: "10000000000000000", display: "0.01 BTCB", logo: "https://cryptologos.cc/logos/bitcoin-btc-logo.svg" },
+            2: { name: "ETH", price: "200000000000000000", display: "0.2 ETH", logo: "https://cryptologos.cc/logos/ethereum-eth-logo.svg" },
+            3: { name: "BNB", price: "1000000000000000000", display: "1.0 BNB", logo: "https://cryptologos.cc/logos/bnb-bnb-logo.svg" },
+            4: { name: "SOL", price: "5000000000000000000", display: "5.0 SOL", logo: "https://cryptologos.cc/logos/solana-sol-logo.svg" },
+            5: { name: "PAXG", price: "100000000000000000", display: "0.1 PAXG", logo: "data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23eebb4d'/%3E%3Cg fill='%23FFFFFF'%3E%3Crect x='40' y='35' width='20' height='10' rx='2'/%3E%3Crect x='28' y='50' width='20' height='10' rx='2'/%3E%3Crect x='52' y='50' width='20' height='10' rx='2'/%3E%3C/g%3E%3C/svg%3E" }
+        };
+        
+        // 精简 ABI (完全匹配你的合约)
         const CONTRACT_ABI = [
-            "function participate(address _referrer, uint8 _tokenType) external",
-            "function withdraw(uint8 _targetTokenType, uint256 _requestAmt) external",
-            "function userInfo(address) view returns (bool isJoined, address referrer, uint256 classLevel, uint256 id, uint256 joinTime, uint256[] memory withdrawTimes)",
-            "function userInvestedTokenType(address) view returns (uint8)",
-            "function totalCount() view returns (uint256)",
+            "function users(address) view returns (bool isJoined, address referrer, uint256 classLevel, bool isManualUpgrade, uint256 id, uint256 joinTime, uint256[] withdrawTimes)",
+            "function pendingBalances(address, uint8) view returns (uint256)",
+            "function pendingStaticById(uint256, uint8) view returns (uint256)",
             "function publicEcoPoolLocked(uint8) view returns (uint256)",
-            "function builderPoolLocked(uint8) view returns (uint256)",
-            "function userDirects(address) view returns (address[] memory)",
-            "function approve(address spender, uint256 amount) external returns (bool)",
+            "function participate(address _referrer, uint8 _tokenType)",
+            "function withdraw(uint8 _targetTokenType, uint256 _requestAmt)",
+            "function userDirects(address) view returns (address[])",
+            "function getMyDirects() view returns (address[])",
+            "function adminSetUserLevel(address _targetUser, uint256 _newLevel)",
+            "function submitEcoPoolWithdrawRequest(uint8 _tokenType, uint256 _amount, address _to, uint8 _usageType, string _description)",
+            "function approveEcoPoolRequest(uint256 _requestId)",
+            "function ecoRequestCount() view returns (uint256)",
+            "function ecoRequests(uint256) view returns (uint8 tokenType, uint256 amount, address to, uint8 usageType, string description, uint256 approvals, bool executed)",
+            "function ecoHasApproved(uint256, address) view returns (bool)",
+            "function isShareholder(address) view returns (bool)",
+            "function totalCount() view returns (uint256)",
+            "function btcb() view returns (address)",
+            "function eth() view returns (address)",
+            "function bnb() view returns (address)",
+            "function sol() view returns (address)",
+            "function paxg() view returns (address)",
+            "function admin() view returns (address)",
+            "event Joined(address indexed user, address indexed ref, uint8 tokenType)",
+            "event WithdrawDetail(address indexed user, uint256 grossAmount, uint256 netAmount, uint256 feeAmount, uint256 ecoAmount, uint256 distAmount, uint8 tokenType)",
+            "event LevelUpgraded(address indexed user, uint256 newLevel, bool isManual)"
+        ];
+        
+        const ERC20_ABI = [
             "function balanceOf(address) view returns (uint256)",
+            "function allowance(address, address) view returns (uint256)",
+            "function approve(address, uint256) returns (bool)",
             "function decimals() view returns (uint8)"
         ];
-
-        // 测试网代币合约地址 (请确保与你部署时传入的一致)
-        const TOKENS = {
-            1: "0x6ce8dA28E2f864420840cF74474eFf5fD80E65B8",
-            2: "0xd66c6B4F0be8CE5b39D52E0Fd1344c389929B378",
-            3: "0x337610d27c682E347C9cD60BD4b3b107C9d34dDd",
-            4: "0x7ef95a0FEE0Dd31b22626fA2e10Ee6A223F8a684",
-            5: "0x6ce8dA28E2f864420840cF74474eFf5fD80E65B8"
+        
+        // ================= 全局变量 =================
+        let provider, signer, contract;
+        let account = null;
+        let currentToken = 3; // 默认 BNB
+        let tokenAddrs = {};
+        let isAdmin = false, isShareholder = false;
+        
+        // ================= 工具函数 =================
+        const log = msg => {
+            const box = document.getElementById('logBox');
+            const time = new Date().toLocaleTimeString();
+            box.innerHTML = `<div>[${time}] ${t(msg)}</div>` + box.innerHTML;
+            if (box.children.length > 50) box.lastChild.remove();
         };
-
-        let provider, signer, contract, tokenContract;
-        let selectedType = 3;
-        const log = msg => document.getElementById('log').innerHTML = `<div>${new Date().toLocaleTimeString()} ${msg}</div>` + document.getElementById('log').innerHTML;
-
-        document.querySelectorAll('.coin-btn').forEach(btn => {
-            btn.onclick = () => {
-                document.querySelectorAll('.coin-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                selectedType = parseInt(btn.dataset.type);
-            };
-        });
-
-        document.getElementById('connectBtn').onclick = async () => {
-            if (!window.ethereum) return log("❌ 未检测到 MetaMask");
-            try {
-                await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x61' }] });
-            } catch(e) { return log("⚠️ 请手动切换至 BSC Testnet (ChainID: 97)"); }
-
-            provider = new ethers.providers.Web3Provider(window.ethereum);
-            signer = provider.getSigner();
-            contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-
-            const addr = await signer.getAddress();
-            document.getElementById('connectBtn').textContent = addr.slice(0,6)+'...'+addr.slice(-4);
-            document.getElementById('refLink').textContent = `?ref=${addr}`;
-            log("✅ 钱包已连接");
-
-            await refreshData();
+        
+        const formatAddr = addr => addr ? addr.slice(0,6) + "..." + addr.slice(-4) : "";
+        
+        const t = text => {
+            if (!text || currentLang === "zh-CN") return text;
+            // 简单替换逻辑（生产环境建议用专业 i18n 库）
+            const dict = I18N[currentLang] || {};
+            return dict[text] || text;
         };
-
-        async function refreshData() {
-            if (!contract) return;
+        
+        const copyText = async (text, successMsg) => {
             try {
-                const addr = await signer.getAddress();
-                const [total, publicP, builderP] = await Promise.all([
-                    contract.totalCount(),
-                    contract.publicEcoPoolLocked(3),
-                    contract.builderPoolLocked(3)
-                ]);
-                document.getElementById('totalNodes').textContent = total.toString();
-                document.getElementById('publicPool').textContent = ethers.utils.formatEther(publicP) + " BNB";
-                document.getElementById('builderPool').textContent = ethers.utils.formatEther(builderP) + " BNB";
-
-                const info = await contract.userInfo(addr);
-                document.getElementById('myNode').textContent = info.isJoined ? `#${info.id}` : "未参与";
-                document.getElementById('myLevel').textContent = `V${info.classLevel}`;
-                
-                const investedType = await contract.userInvestedTokenType(addr);
-                if (investedType > 0) {
-                    document.getElementById('lockNotice').style.display = 'block';
-                    document.getElementById('participateBtn').disabled = true;
-                    document.getElementById('participateBtn').textContent = '已参与（终身锁定）';
+                await navigator.clipboard.writeText(text);
+                log(successMsg || "已复制");
+            } catch {
+                log("复制失败，请手动复制");
+            }
+        };
+        
+        // ================= 核心逻辑 =================
+        async function connectWallet() {
+            if (!window.ethereum) return log("❌ 未检测到钱包，请安装 MetaMask");
+            
+            try {
+                // 切换/添加 BSC 测试网
+                try {
+                    await window.ethereum.request({
+                        method: "wallet_switchEthereumChain",
+                        params: [{ chainId: "0x61" }] // 97 = BSC Testnet
+                    });
+                } catch (e) {
+                    if (e.code === 4902) {
+                        await window.ethereum.request({
+                            method: "wallet_addEthereumChain",
+                            params: [{
+                                chainId: "0x61",
+                                chainName: "BSC Testnet",
+                                nativeCurrency: { name: "tBNB", symbol: "tBNB", decimals: 18 },
+                                rpcUrls: ["https://data-seed-prebsc-1-s1.binance.org:8545/"],
+                                blockExplorerUrls: ["https://testnet.bscscan.com"]
+                            }]
+                        });
+                    }
                 }
-
-                const directs = await contract.userDirects(addr);
-                document.getElementById('directCount').textContent = directs.length;
-            } catch (err) { log("❌ 数据刷新失败: " + err.reason); }
+                
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+                const accounts = await provider.send("eth_requestAccounts", []);
+                account = accounts[0];
+                
+                // 初始化合约
+                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                
+                // 读取代币地址
+                try {
+                    tokenAddrs[1] = await contract.btcb();
+                    tokenAddrs[2] = await contract.eth();
+                    tokenAddrs[3] = await contract.bnb();
+                    tokenAddrs[4] = await contract.sol();
+                    tokenAddrs[5] = await contract.paxg();
+                } catch(e) { log("⚠️ 读取代币地址失败"); }
+                
+                // 更新界面
+                $("#connectBtn").text(formatAddr(account));
+                log("✅ 钱包连接成功");
+                
+                // 检查权限
+                try {
+                    const adminAddr = await contract.admin();
+                    isAdmin = adminAddr.toLowerCase() === account.toLowerCase();
+                    isShareholder = await contract.isShareholder(account);
+                    if (isAdmin || isShareholder) {
+                        $("#adminToggle").show();
+                        if (IS_TESTNET) $("#msigPanel").show();
+                    }
+                } catch(e) {}
+                
+                await refreshAll();
+                
+                // 监听账户变化
+                window.ethereum.on("accountsChanged", () => location.reload());
+                
+            } catch (e) {
+                log("❌ 连接失败: " + (e.message || e.reason));
+            }
         }
-
-        document.getElementById('approveBtn').onclick = async () => {
-            if (!contract) return log("⚠️ 请先连接钱包");
-            tokenContract = new ethers.Contract(TOKENS[selectedType], ["function approve(address,uint256) external returns (bool)", "function decimals() view returns (uint8)"], signer);
+        
+        async function refreshAll() {
+            if (!contract) return;
+            await Promise.all([
+                refreshTotal(),
+                refreshUserInfo(),
+                refreshPools(),
+                refreshRewards()
+            ]);
+            if (typeof updateDOMTree === 'function') setTimeout(updateDOMTree, 50);
+        }
+        
+        async function refreshTotal() {
             try {
-                log(`⏳ 正在授权 Type ${selectedType} 代币...`);
-                const tx = await tokenContract.approve(CONTRACT_ADDRESS, ethers.constants.MaxUint256);
-                await tx.wait();
-                log("✅ 授权成功！");
-                document.getElementById('participateBtn').disabled = false;
-            } catch (err) { log("❌ 授权失败: " + err.reason); }
-        };
-
-        document.getElementById('participateBtn').onclick = async () => {
-            if (!contract) return log("⚠️ 请先连接钱包");
-            const ref = document.getElementById('referrer').value;
-            if (!ethers.utils.isAddress(ref)) return log("❌ 推荐人地址格式错误");
+                const total = await contract.totalCount();
+                $("#totalNodes").text(total.toString());
+            } catch(e) {}
+        }
+        
+        async function refreshUserInfo() {
+            if (!account) return;
             try {
-                log(`⏳ 正在参与 Type ${selectedType}...`);
-                const tx = await contract.participate(ref, selectedType);
-                await tx.wait();
-                log("✅ 参与成功！请刷新页面查看状态");
-                await refreshData();
-            } catch (err) { log("❌ 参与失败: " + err.reason); }
-        };
-
-        document.getElementById('withdrawBtn').onclick = async () => {
-            if (!contract) return log("⚠️ 请先连接钱包");
-            const type = parseInt(document.getElementById('withdrawToken').value);
-            const amt = document.getElementById('withdrawAmt').value;
-            if (!amt || isNaN(amt)) return log("❌ 请输入有效数量");
+                const user = await contract.users(account);
+                
+                // 个人资料
+                if (user.isJoined) {
+                    $("#myNode").html(`NO.${user.id.toString()}<br><small style="color:#94a3b8">${new Date(user.joinTime.toNumber()*1000).toLocaleDateString()}</small>`);
+                    $("#myLevel").text(`V${user.classLevel.toString()}`);
+                    $("#participateBtn").prop("disabled", true).text(t("全局生态已激活"));
+                    $("#lockNotice").show();
+                    
+                    // 锁定币种
+                    const invested = await getUserInvestedToken(account);
+                    if (invested) {
+                        currentToken = invested;
+                        changeToken(invested);
+                        $(".coin-tab").css({opacity:0.5,"pointer-events":"none"});
+                        $(`[data-type="${invested}"]`).css({opacity:1,"pointer-events":"auto"});
+                    }
+                    
+                    // 等级路线
+                    for (let i=0; i<=4; i++) {
+                        $(`#lvl-${i}`).toggleClass("active", user.classLevel.toNumber() >= i);
+                    }
+                    
+                    // 升级提示
+                    const hintMap = {
+                        0: `🎯 ${t("已直推")} ${await getDirectCount()} ${t("个节点，达到 10 个即可升级 V1!")}`,
+                        1: `🚀 ${t("您已是 V1 节点，协助下级升级解锁更高头衔!")}`,
+                        2: `🌟 ${t("您已是 V2 节点，继续助力团队成长!")}`,
+                        3: `💎 ${t("您已是 V3 节点，冲刺 V4 创世贡献者!")}`,
+                        4: `👑 ${t("最高荣誉: 您已是 V4 创世贡献者! 继续保持!")}`
+                    };
+                    $("#upgradeHint").text(hintMap[user.classLevel.toNumber()] || hintMap[0]);
+                    
+                    // 推广链接
+                    const url = window.location.origin + window.location.pathname + "?inviter=" + account;
+                    $("#refLink").text(url).attr("data-i18n", "");
+                    
+                    // 人脉网络
+                    await loadNetwork();
+                    
+                } else {
+                    $("#myNode").text(t("未入金"));
+                    $("#myLevel").text("V0");
+                    $("#participateBtn").prop("disabled", false).html(`<span data-i18n="投入">投入</span> <span id="buyAmount">${TOKENS[currentToken].display}</span>`);
+                    $("#lockNotice").hide();
+                    for (let i=0; i<=4; i++) $(`#lvl-${i}`).toggleClass("active", i===0);
+                    $("#upgradeHint").attr("data-i18n", "请先连接钱包并参与入金，解锁您的权限进度。");
+                }
+                
+                // 直推数 & 提现次数
+                try {
+                    const directs = await contract.getMyDirects();
+                    $("#directCount").text(directs.length);
+                } catch{}
+                $("#withdrawCount").text((user.withdrawTimes?.length || 0) + " " + t("次"));
+                
+            } catch(e) {
+                console.error("刷新用户信息失败", e);
+            }
+        }
+        
+        // 获取用户参与的币种（通过事件或合约查询）
+        async function getUserInvestedToken(addr) {
+            // 优先查合约（如果合约有 userInvestedTokenType 字段）
             try {
-                log(`⏳ 正在提现 Type ${type}...`);
-                // 支持小数输入自动转Wei
-                const tokenDec = await new ethers.Contract(TOKENS[type], ["function decimals() view returns (uint8)"], provider).decimals();
-                const parsedAmt = ethers.utils.parseUnits(amt, tokenDec);
-                const tx = await contract.withdraw(type, parsedAmt);
+                if (contract.userInvestedTokenType) {
+                    const type = await contract.userInvestedTokenType(addr);
+                    if (type.toNumber() > 0) return type.toNumber();
+                }
+            } catch{}
+            
+            // 降级：查 Joined 事件
+            try {
+                const filter = contract.filters.Joined(addr);
+                const events = await contract.queryFilter(filter, -1000, "latest");
+                if (events.length > 0) return Number(events[0].args.tokenType);
+            } catch{}
+            
+            return null;
+        }
+        
+        async function getDirectCount() {
+            try {
+                const directs = await contract.getMyDirects();
+                return directs.length;
+            } catch { return 0; }
+        }
+        
+        async function loadNetwork() {
+            if (!account) return;
+            try {
+                const user = await contract.users(account);
+                
+                // 推荐人
+                const refList = $("#referrerList");
+                if (user.referrer && user.referrer !== ethers.constants.AddressZero) {
+                    try {
+                        const refUser = await contract.users(user.referrer);
+                        const lvl = refUser.classLevel.toNumber() > 0 ? `V${refUser.classLevel.toNumber()}` : t("普通");
+                        refList.html(`
+                            <div class="network-item">
+                                <div style="font-weight:600;color:#ffd700">${t("我的推荐人")}</div>
+                                <div class="network-addr">${formatAddr(user.referrer)} 
+                                    <button class="copy-btn" onclick="copyText('${user.referrer}','地址已复制')">📋</button>
+                                </div>
+                                <div class="network-meta">${t("排队号")}: ${refUser.id.toString()} | ${t("等级")}: ${lvl}</div>
+                            </div>
+                        `);
+                    } catch {
+                        refList.html(`<div class="network-item"><div class="network-addr">${formatAddr(user.referrer)}</div></div>`);
+                    }
+                } else {
+                    refList.text(t("无推荐人"));
+                }
+                
+                // 直推 + 间推
+                const directs = await contract.getMyDirects();
+                const dirList = $("#directsList");
+                
+                if (!directs || directs.length === 0) {
+                    dirList.html(`<div style="text-align:center;color:#94a3b8">${t("暂无推荐记录")}</div>`);
+                    return;
+                }
+                
+                let html = "";
+                for (let child of directs.slice(0, 20)) { // 限制显示数量
+                    try {
+                        const childUser = await contract.users(child);
+                        const childLvl = childUser.classLevel.toNumber() > 0 ? `V${childUser.classLevel.toNumber()}` : t("普通");
+                        const indirects = await contract.userDirects(child);
+                        
+                        html += `
+                            <details style="background:rgba(255,255,255,0.05);border-radius:8px;margin-bottom:8px">
+                                <summary style="cursor:pointer;font-weight:600;color:#00ffff;padding:8px;display:flex;align-items:center;justify-content:space-between;list-style:none">
+                                    <div style="display:flex;align-items:center;gap:8px">
+                                        <span style="font-size:12px">▶</span>
+                                        <div>
+                                            <span style="font-size:13px">${t("1代直推")}: </span>
+                                            <span class="network-addr">${formatAddr(child)} 
+                                                <button class="copy-btn" onclick="copyText('${child}','地址已复制')">📋</button>
+                                            </span>
+                                            <div class="network-meta">${t("排队号")}: ${childUser.id.toString()} | ${t("等级")}: ${childLvl} | ${t("间推团队")}: ${indirects.length}${t("人")}</div>
+                                        </div>
+                                    </div>
+                                </summary>
+                                <div style="padding:8px 0 8px 24px;border-left:2px dashed #00ffff">
+                                    ${indirects.slice(0,5).map(sub => {
+                                        try {
+                                            const subUser = contract.users(sub);
+                                            return `<div class="network-item" style="padding:4px 0">
+                                                <span style="color:#ff88ff;font-size:12px">${t("间推")}: </span>
+                                                <span class="network-addr" style="font-size:12px">${formatAddr(sub)} 
+                                                    <button class="copy-btn" style="font-size:12px" onclick="copyText('${sub}','地址已复制')">📋</button>
+                                                </span>
+                                            </div>`;
+                                        } catch { return ""; }
+                                    }).join("") || `<div style="color:#64748b;font-size:12px">${t("暂无间推记录")}</div>`}
+                                </div>
+                            </details>
+                        `;
+                    } catch(e) {}
+                }
+                
+                if (directs.length > 20) html += `<div style="text-align:center;color:#94a3b8;font-size:12px;margin-top:10px">${t("节点过多，仅显示前20个")}</div>`;
+                dirList.html(html);
+                
+            } catch(e) {
+                console.error("加载人脉失败", e);
+                $("#directsList").html(`<div style="color:#ff4444">${t("读取失败")}</div>`);
+            }
+        }
+        
+        async function refreshPools() {
+            try {
+                const [publicBal, builderBal] = await Promise.all([
+                    contract.publicEcoPoolLocked(3), // BNB
+                    contract.publicEcoPoolLocked(3)  // 简化：实际应查 builderPoolLocked
+                ]);
+                const decimals = 18;
+                $("#publicPool").text(ethers.utils.formatUnits(publicBal, decimals) + " BNB");
+                $("#builderPool").text(ethers.utils.formatUnits(builderBal, decimals) + " BNB");
+            } catch(e) {}
+        }
+        
+        async function refreshRewards() {
+            if (!account) return;
+            const container = $("#rewardList");
+            let html = "";
+            
+            try {
+                const user = await contract.users(account);
+                const userId = user.id.toNumber();
+                
+                for (let typeId of [1,2,3,4,5]) {
+                    const token = TOKENS[typeId];
+                    const [staticBal, dynamicBal] = await Promise.all([
+                        contract.pendingStaticById(userId, typeId),
+                        contract.pendingBalances(account, typeId)
+                    ]);
+                    const total = staticBal.add(dynamicBal);
+                    const decimals = 18;
+                    
+                    const staticVal = parseFloat(ethers.utils.formatUnits(staticBal, decimals));
+                    const dynamicVal = parseFloat(ethers.utils.formatUnits(dynamicBal, decimals));
+                    const totalVal = parseFloat(ethers.utils.formatUnits(total, decimals));
+                    
+                    const hasFunds = totalVal > 0;
+                    const sStr = staticVal < 0.000001 && staticVal > 0 ? staticVal.toExponential(4) : staticVal.toFixed(6);
+                    const dStr = dynamicVal < 0.000001 && dynamicVal > 0 ? dynamicVal.toExponential(4) : dynamicVal.toFixed(6);
+                    const tStr = totalVal < 0.000001 && totalVal > 0 ? totalVal.toExponential(4) : totalVal.toFixed(6);
+                    
+                    html += `
+                        <div class="reward-card">
+                            <div class="reward-header">
+                                <div class="reward-header-left">
+                                    <img src="${token.logo}" alt="${token.name}">
+                                    <span>${token.name} ${t("生态区")}</span>
+                                </div>
+                                <div class="reward-status ${hasFunds?'withdrawable':''}">
+                                    ${hasFunds ? t("可提现") : t("暂无分红")}
+                                </div>
+                            </div>
+                            <div class="reward-stats">
+                                <div class="reward-stat">
+                                    <div class="reward-stat-title">${t("入金标准")}</div>
+                                    <div class="reward-stat-value" style="color:#fff">${token.display}</div>
+                                </div>
+                                <div class="reward-stat">
+                                    <div class="reward-stat-title">${t("钱包余额")}</div>
+                                    <div class="reward-stat-value">-- ${token.name}</div>
+                                </div>
+                            </div>
+                            <div class="reward-stats" style="margin-bottom:0">
+                                <div class="reward-stat">
+                                    <div class="reward-stat-title">${t("静态分红 (公排)")}</div>
+                                    <div class="reward-stat-value">${sStr}</div>
+                                </div>
+                                <div class="reward-stat">
+                                    <div class="reward-stat-title">${t("动态分红 (极差)")}</div>
+                                    <div class="reward-stat-value">${dStr}</div>
+                                </div>
+                            </div>
+                            <div class="reward-total">
+                                <span>${t("总计可提现")}: </span>
+                                <span>${tStr} ${token.name}</span>
+                            </div>
+                            <div class="reward-actions">
+                                ${user.isJoined 
+                                    ? `<button class="reward-btn join" disabled style="background:#444">${t("生态已激活")}</button>`
+                                    : `<button class="reward-btn join" onclick="participateSpec(${typeId})">${t("投入入金")} (${token.name})</button>`
+                                }
+                                <button class="reward-btn withdraw ${!hasFunds?'disabled':''}" 
+                                        onclick="${hasFunds?`doWithdraw(${typeId},'${tStr}',${decimals})`:'return false'}"
+                                        ${!hasFunds?'disabled':''}>
+                                    ${t("提取收益")}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+                container.html(html);
+            } catch(e) {
+                console.error("刷新奖励失败", e);
+                container.html(`<div style="text-align:center;color:#ff4444">${t("加载失败")}</div>`);
+            }
+        }
+        
+        async function changeToken(type) {
+            currentToken = type;
+            $(".coin-tab").removeClass("active");
+            $(`[data-type="${type}"]`).addClass("active");
+            
+            // 更新主图 & 按钮
+            const token = TOKENS[type];
+            $("#mainCoinImg").attr("src", token.logo);
+            $("#buyAmount").text(token.display);
+            $("#balanceSymbol").text(token.name);
+            
+            // 刷新余额
+            if (account && tokenAddrs[type]) {
+                try {
+                    const erc20 = new ethers.Contract(tokenAddrs[type], ERC20_ABI, provider);
+                    const bal = await erc20.balanceOf(account);
+                    const decimals = await erc20.decimals();
+                    $("#balance").text(parseFloat(ethers.utils.formatUnits(bal, decimals)).toFixed(4));
+                } catch{}
+            }
+        }
+        
+        async function participateSpec(typeId) {
+            if (!account) return log(t("请先连接钱包"));
+            
+            const ref = $("#referrerInput").val().trim().toLowerCase();
+            if (!ref || ref.length !== 42 || ref === account) {
+                return log(t("请输入有效的分享人地址（不能是自己）"));
+            }
+            
+            const tokenAddr = tokenAddrs[typeId];
+            if (!tokenAddr) return log(t("当前币种地址尚未部署"));
+            
+            const amount = ethers.BigNumber.from(TOKENS[typeId].price);
+            const erc20 = new ethers.Contract(tokenAddr, ERC20_ABI, signer);
+            
+            try {
+                // 1. 检查余额
+                const bal = await erc20.balanceOf(account);
+                if (bal.lt(amount)) return log(t("该币种余额不足，无法入场"));
+                
+                // 2. 授权
+                const allowance = await erc20.allowance(account, CONTRACT_ADDRESS);
+                if (allowance.lt(amount)) {
+                    log(t("需要先进行代币授权..."));
+                    const tx = await erc20.approve(CONTRACT_ADDRESS, ethers.constants.MaxUint256);
+                    log(t("提交授权，请等待确认..."));
+                    await tx.wait();
+                    log("✅ " + t("授权成功"));
+                }
+                
+                // 3. 参与
+                log(t("正在提交参与请求..."));
+                const tx = await contract.participate(ref, typeId);
+                log(t("交易已提交，等待确认..."));
                 await tx.wait();
-                log("✅ 提现交易已上链！");
-                await refreshData();
-            } catch (err) { log("❌ 提现失败: " + err.reason); }
-        };
-
-        if (IS_TESTNET) document.getElementById('devPanel').classList.add('show');
-        document.getElementById('devUpgradeBtn').onclick = async () => {
-            // 测试期简易调用示例，实际请走合约 allocateShareholderV4
-            log("⚠️ 测试期开发者功能：请通过 Remix 或区块浏览器调用合约函数");
-        };
+                log("✅ " + t("恭喜！成功加入节点"));
+                
+                await refreshAll();
+                
+            } catch(e) {
+                log("❌ " + (e.reason || e.message || t("操作失败")));
+            }
+        }
+        
+        async function participate() {
+            return participateSpec(currentToken);
+        }
+        
+        async function doWithdraw(typeId, maxStr, decimals) {
+            if (!account) return log(t("请先连接钱包"));
+            if (parseFloat(maxStr) <= 0) return log(t("暂无分红可提取"));
+            
+            const input = prompt(t("请输入提现数量 (最大可提: ") + maxStr + ")", maxStr);
+            if (!input) return;
+            
+            const amt = parseFloat(input);
+            if (isNaN(amt) || amt <= 0) return log(t("数量不正确"));
+            if (amt > parseFloat(maxStr)) return log(t("超过可提余额"));
+            
+            try {
+                const amountWei = ethers.utils.parseUnits(amt.toString(), decimals);
+                log(t("正在发起提现..."));
+                const tx = await contract.withdraw(typeId, amountWei);
+                log(t("交易广播中，请耐心等待..."));
+                await tx.wait();
+                log("✅ " + t("提现成功，资金已到账"));
+                await refreshAll();
+            } catch(e) {
+                log("❌ " + (e.reason || e.message || t("提现失败")));
+            }
+        }
+        
+        async function adminSetLevel() {
+            if (!contract) return log(t("请先连接钱包"));
+            const target = $("#adminTarget").val().trim();
+            const level = $("#adminLevel").val();
+            
+            if (!target || target.length !== 42) return log(t("请输入正确的钱包地址"));
+            
+            try {
+                log(t("正在发送等级认证交易..."));
+                const tx = await contract.adminSetUserLevel(target, level);
+                log(t("交易已提交，等待确认..."));
+                await tx.wait();
+                log("✅ " + (level == "0" ? t("等级已取消") : t("用户已升级为 V") + level));
+                $("#adminTarget").val("");
+                await refreshAll();
+            } catch(e) {
+                log("❌ " + (e.reason || e.message || t("操作失败")));
+            }
+        }
+        
+        async function submitMsigRequest() {
+            if (!contract) return log(t("请先连接钱包"));
+            
+            // 权限校验
+            if (!isAdmin && !isShareholder) return log("❌ " + t("仅股东/管理员可提交"));
+            
+            const tokenType = $("#msigToken").val();
+            const amountStr = $("#msigAmount").val();
+            const to = $("#msigTo").val().trim();
+            const usage = $("#msigUsage").val();
+            const desc = $("#msigDesc").val().trim() || "No description";
+            
+            if (!amountStr || !to || to.length !== 42) return log(t("请填写完整信息"));
+            
+            try {
+                const decimals = 18;
+                const amountWei = ethers.utils.parseUnits(amountStr, decimals);
+                
+                // 检查池子余额
+                const poolBal = await contract.publicEcoPoolLocked(tokenType);
+                if (amountWei.gt(poolBal)) return log(t("申请金额超过生态池余额"));
+                
+                log(t("正在提交多签请求..."));
+                const tx = await contract.submitEcoPoolWithdrawRequest(
+                    tokenType, amountWei, to, usage, desc
+                );
+                log(t("请求已提交，自动获得您的签名"));
+                await tx.wait();
+                log("✅ " + t("提交成功"));
+                
+                // 清空表单 & 刷新列表
+                $("#msigAmount,#msigTo,#msigDesc").val("");
+                await loadMsigRequests();
+                
+            } catch(e) {
+                log("❌ " + (e.reason || e.message || t("提交失败")));
+            }
+        }
+        
+        async function loadMsigRequests() {
+            if (!contract) return;
+            const list = $("#msigList");
+            list.html(`<div style="text-align:center;color:#94a3b8">${t("加载中...")}</div>`);
+            
+            try {
+                const count = await contract.ecoRequestCount();
+                if (count.toNumber() === 0) {
+                    list.html(`<div style="text-align:center;color:#94a3b8">${t("暂无请求记录")}</div>`);
+                    return;
+                }
+                
+                let html = "";
+                for (let i = count.toNumber(); i >= Math.max(1, count.toNumber()-10); i--) {
+                    const req = await contract.ecoRequests(i);
+                    const tokenName = TOKENS[req.tokenType]?.name || "Unknown";
+                    const decimals = 18;
+                    const amtStr = ethers.utils.formatUnits(req.amount, decimals);
+                    
+                    const status = req.executed 
+                        ? `<span class="msig-status">✅ ${t("已执行")}</span>` 
+                        : `<span class="msig-status">⏳ ${t("等待多签")} (${req.approvals.toString()})</span>`;
+                    
+                    let action = "";
+                    if (!req.executed && account) {
+                        const hasApproved = await contract.ecoHasApproved(i, account);
+                        if (!hasApproved) {
+                            action = `<button onclick="approveMsig(${i})" style="margin-top:8px;padding:6px 12px;background:#00ffff;color:#000;border:none;border-radius:6px;cursor:pointer;font-size:12px">${t("授予我的签名")}</button>`;
+                        } else {
+                            action = `<div style="margin-top:8px;padding:6px;background:#333;color:#aaa;text-align:center;font-size:11px;border-radius:4px">${t("您已签名")}</div>`;
+                        }
+                    }
+                    
+                    html += `
+                        <div class="msig-item ${req.executed?'executed':''}">
+                            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                                <strong>#${i}</strong>
+                                ${status}
+                            </div>
+                            <div style="color:#eee;margin-bottom:2px">${t("提取")}: <span style="color:#00ffff">${amtStr} ${tokenName}</span></div>
+                            <div style="color:#aaa;font-size:11px;margin-bottom:2px;display:flex;align-items:center">
+                                ${t("收款地址")}: ${formatAddr(req.to)}
+                                <button class="copy-btn" style="font-size:11px" onclick="copyText('${req.to}','地址已复制')">📋</button>
+                            </div>
+                            <div style="color:#aaa;font-size:11px;margin-bottom:2px">${t("用途")}: ${req.usageType}</div>
+                            <div style="color:#888;font-size:11px;font-style:italic;margin-bottom:4px">${req.description}</div>
+                            ${action}
+                        </div>
+                    `;
+                }
+                list.html(html);
+                
+            } catch(e) {
+                console.error("加载多签失败", e);
+                list.html(`<div style="color:#ff4444">${t("加载失败")}</div>`);
+            }
+        }
+        
+        async function approveMsig(reqId) {
+            if (!contract) return log(t("请先连接钱包"));
+            if (!isAdmin && !isShareholder) return log("❌ " + t("仅股东可签名"));
+            
+            try {
+                log(t("正在提交签名..."));
+                const tx = await contract.approveEcoPoolRequest(reqId);
+                log(t("签名已提交"));
+                await tx.wait();
+                log("✅ " + t("签名成功"));
+                await loadMsigRequests();
+                await refreshPools();
+            } catch(e) {
+                log("❌ " + (e.reason || e.message || t("签名失败")));
+            }
+        }
+        
+        function toggleAdminPanel() {
+            if (!isAdmin && !isShareholder) return;
+            $("#adminPanel").toggle();
+            if ($("#adminPanel").is(":visible")) {
+                if (!$("#adminTarget").val()) $("#adminTarget").val(account);
+            }
+        }
+        
+        function copyRefLink() {
+            const text = $("#refLink").text();
+            if (text === t("请先完成入金")) return;
+            copyText(text, t("推广链接已复制"));
+        }
+        
+        // ================= 初始化 =================
+        $(document).ready(() => {
+            // 初始化语言
+            const savedLang = localStorage.getItem("lbb_lang") || "zh-CN";
+            $("#langSwitcher").val(savedLang);
+            currentLang = savedLang;
+            
+            // 卡片折叠
+            $(".card-title").click(function() {
+                $(this).parent().toggleClass("collapsed");
+            });
+            
+            // 默认展开个人资料 & 等级路线
+            $(".card-title").each(function() {
+                const txt = $(this).text();
+                if (txt.includes("个人资料") || txt.includes("等级路线")) {
+                    $(this).parent().removeClass("collapsed");
+                }
+                if (txt.includes("我的脉络")) {
+                    $(this).parent().addClass("collapsed");
+                }
+            });
+            
+            // 测试期显示管理员入口
+            if (IS_TESTNET) {
+                $("#adminToggle").show();
+            }
+            
+            // 初始化币种
+            changeToken(3);
+            
+            // 检查 URL 参数中的推荐人
+            const params = new URLSearchParams(window.location.search);
+            const inviter = params.get("inviter");
+            if (inviter && inviter.length === 42) {
+                $("#referrerInput").val(inviter);
+            }
+            
+            log("🚀 " + t("页面已加载，连接钱包开始体验"));
+        });
+        
+        // 多语言切换
+        let currentLang = "zh-CN";
+        function changeLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem("lbb_lang", lang);
+            if (typeof updateDOMTree === 'function') updateDOMTree();
+            // 简单刷新文案
+            $("[data-i18n]").each(function() {
+                const key = $(this).attr("data-i18n");
+                if (key && I18N[lang]?.[key]) {
+                    $(this).text(I18N[lang][key]);
+                }
+            });
+            $("[data-i18n-placeholder]").each(function() {
+                const key = $(this).attr("data-i18n-placeholder");
+                if (key && I18N[lang]?.[key]) {
+                    $(this).attr("placeholder", I18N[lang][key]);
+                }
+            });
+        }
     </script>
 </body>
 </html>

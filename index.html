@@ -651,7 +651,6 @@
         color: #777;
         cursor: not-allowed;
       }
-      /* 节点地图样式 */
       .node-map-grid {
         display: flex;
         flex-wrap: wrap;
@@ -663,6 +662,7 @@
         background: #0f0f1a;
         border-radius: 16px;
       }
+      /* 滚动公告条悬停暂停样式 */
       .marquee-container {
         background: rgba(255,215,0,0.1);
         padding: 8px 0;
@@ -671,6 +671,7 @@
         border-bottom: 1px solid rgba(255,215,0,0.3);
         border-top: 1px solid rgba(255,215,0,0.3);
         margin-top: 5px;
+        cursor: pointer;
       }
       .marquee-text {
         display: inline-block;
@@ -679,6 +680,9 @@
         color: #ffd700;
         font-size: 13px;
         font-weight: bold;
+      }
+      .marquee-container.paused .marquee-text {
+        animation-play-state: paused;
       }
       @keyframes marquee {
         0% { transform: translateX(0); }
@@ -831,12 +835,15 @@
     </div>
 
     <script>
-      // 合约地址（你的正确地址）
+      // 合约地址（正确地址）
       const DEFAULT_ADDRESS = "0xd40b700e44603591f5e0fb2b89d646f2dc423d57".toLowerCase();
       let CONTRACT_ADDRESS = localStorage.getItem("v3_contract_address") || DEFAULT_ADDRESS;
 
       window.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("devMainContract").value = CONTRACT_ADDRESS;
+        // 初始化滚动公告悬停暂停
+        initMarqueePause();
+        // 读取节点总数（不连钱包）
         const rpcUrls = ["https://bscrpc.com","https://binance.llamarpc.com","https://bsc-dataseed.binance.org/","https://bsc-dataseed1.defibit.io/","https://rpc.ankr.com/bsc","https://1rpc.io/bnb"];
         let total = "0";
         for (let rpc of rpcUrls) {
@@ -980,7 +987,7 @@
         });
       }
 
-      // 节点地图（修复版）
+      // 节点地图（修复版：真实读取等级）
       async function drawNodeMap(){
         let container=document.getElementById('nodeMapContainer');
         if(!container) return;
@@ -988,6 +995,7 @@
         try{
           let total=await mainContract.totalCount();
           let maxShow=Math.min(Number(total),200);
+          if(maxShow===0){ container.innerHTML='<div style="text-align:center; color:#aaa;">暂无节点</div>'; return; }
           container.innerHTML='<div style="text-align:center; color:#ffaa00;">加载节点地图中...</div>';
           let html='';
           for(let i=1;i<=maxShow;i++){
@@ -996,15 +1004,15 @@
               if(addr && addr!==ethers.constants.AddressZero){
                 let u=await mainContract.users(addr);
                 let level=Number(u.classLevel);
-                let color=level==1?'#00cc66':level==2?'#3399ff':level==3?'#aa66ff':level==4?'#ffcc00':'#666';
-                html+=`<div style="width:28px; height:28px; background:${color}; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:bold; color:#000; margin:2px;" title="ID ${i} V${level}">${i}</div>`;
+                let color=level===1?'#00cc66':level===2?'#3399ff':level===3?'#aa66ff':level===4?'#ffcc00':'#666666';
+                html+=`<div style="width:32px; height:32px; background:${color}; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold; color:#000; margin:2px;" title="ID ${i} V${level}">${i}</div>`;
               } else {
-                html+=`<div style="width:28px; height:28px; background:#2a2a3a; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; color:#888; margin:2px;" title="未激活">?</div>`;
+                html+=`<div style="width:32px; height:32px; background:#2a2a3a; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; font-size:11px; color:#888; margin:2px;" title="未激活">?</div>`;
               }
             }catch(e){
-              html+=`<div style="width:28px; height:28px; background:#2a2a3a; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; color:#888; margin:2px;" title="读取失败">?</div>`;
+              html+=`<div style="width:32px; height:32px; background:#2a2a3a; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; font-size:11px; color:#888; margin:2px;" title="读取失败">?</div>`;
             }
-            if(i%20===0){ container.innerHTML=html; await new Promise(r=>setTimeout(r,50)); }
+            if(i%20===0){ container.innerHTML=html; await new Promise(r=>setTimeout(r,30)); }
           }
           container.innerHTML=html;
         }catch(e){ container.innerHTML='<div style="text-align:center; color:#ff8888;">加载失败，请刷新页面重试</div>'; }
@@ -1060,7 +1068,7 @@
         }catch(e){ msg("提现失利: "+ (e.reason||e.message)); }
       }
 
-      // 提现明细弹窗
+      // 提现明细弹窗（点击次数时调用）
       async function showWithdrawDetails(){
         if(!account || !mainContract) return msg("请先连接钱包");
         const user=await mainContract.users(account);
@@ -1079,45 +1087,53 @@
         document.body.insertAdjacentHTML('beforeend', modalHtml);
       }
 
-      // 提币历史记录（修复版）
+      // 提币历史记录（修复版：显示币种、总额、到账）
       window.loadWithdrawHistory=async function(){
         if(!account || !mainContract) return;
         let container=$("#withdrawHistoryContainer");
         container.html('<div style="text-align:center; color:#aaa;">加载中...</div>');
         try{
-          const user=await mainContract.users(account);
-          let withdrawTimes=user.withdrawTimes;
-          if(!withdrawTimes || withdrawTimes.length===0){
+          const currentBlock=await provider.getBlockNumber();
+          const fromBlock=currentBlock-10000>0?currentBlock-10000:0;
+          const filter=mainContract.filters.WithdrawDetail(account);
+          let logs=await mainContract.queryFilter(filter, fromBlock, 'latest');
+          if(!logs || logs.length===0){
             container.html('<div style="text-align:center; color:#888;">暂无提币记录</div>');
             return;
           }
+          logs.reverse();
           let historyHtml='';
-          for(let i=withdrawTimes.length-1;i>=0;i--){
-            let ts=withdrawTimes[i].toNumber();
-            let date=new Date(ts*1000).toLocaleString();
-            let amountInfo='--';
-            let tokenName='--';
-            try{
-              let filter=mainContract.filters.WithdrawDetail(account);
-              let logs=await mainContract.queryFilter(filter, ts-20, ts+20);
-              if(logs.length>0){
-                let log=logs[logs.length-1];
-                let tType=log.args.tokenType;
-                tokenName=PRICING[tType]?PRICING[tType].name:'Unknown';
-                let decimals=18;
-                let tokenAddr=getEffectiveTokenAddress(tType);
-                if(tokenAddr){
-                  try{ let erc=new ethers.Contract(tokenAddr, erc20ABI, provider); decimals=await erc.decimals(); }catch(e){}
-                }
-                let netAmt=ethers.utils.formatUnits(log.args.netAmount, decimals);
-                amountInfo=parseFloat(netAmt).toFixed(6);
-              }
-            }catch(e){ amountInfo='金额需上链查询'; }
-            historyHtml+=`<div style="border-bottom:1px dotted #444; padding:6px 0;"><div>📅 ${date}</div><div>💰 ${tokenName} ${amountInfo}</div></div>`;
+          for(let log of logs.slice(0,20)){
+            const args=log.args;
+            const tType=args.tokenType;
+            const grossWei=args.grossAmount;
+            const netWei=args.netAmount;
+            let tokenName=PRICING[tType]?PRICING[tType].name:'Unknown';
+            let decimals=18;
+            const tokenAddr=getEffectiveTokenAddress(tType);
+            if(tokenAddr){
+              try{ const erc=new ethers.Contract(tokenAddr, erc20ABI, provider); decimals=await erc.decimals(); }catch(e){}
+            }
+            const grossAmt=parseFloat(ethers.utils.formatUnits(grossWei, decimals)).toFixed(6);
+            const netAmt=parseFloat(ethers.utils.formatUnits(netWei, decimals)).toFixed(6);
+            let txDate='未知时间';
+            try{ const block=await provider.getBlock(log.blockNumber); if(block) txDate=new Date(block.timestamp*1000).toLocaleString(); }catch(e){}
+            historyHtml+=`<div style="border-bottom:1px dotted #444; padding:8px 0;"><div>📅 ${txDate}</div><div>💰 ${tokenName} 提现总额: ${grossAmt} | 到账: ${netAmt}</div></div>`;
           }
+          if(historyHtml==='') historyHtml='<div style="text-align:center; color:#888;">暂无提币记录</div>';
           container.html(historyHtml);
         }catch(e){ console.error(e); container.html('<div style="text-align:center; color:#ff8888;">加载失败，请刷新重试</div>'); }
       };
+
+      // 滚动公告悬停暂停
+      function initMarqueePause(){
+        const marqueeContainer=document.querySelector('.marquee-container');
+        if(!marqueeContainer) return;
+        marqueeContainer.addEventListener('mouseenter',()=>{ marqueeContainer.classList.add('paused'); });
+        marqueeContainer.addEventListener('mouseleave',()=>{ marqueeContainer.classList.remove('paused'); });
+        marqueeContainer.addEventListener('touchstart',()=>{ marqueeContainer.classList.add('paused'); });
+        marqueeContainer.addEventListener('touchend',()=>{ setTimeout(()=>marqueeContainer.classList.remove('paused'),300); });
+      }
 
       async function getInfo(){
         if(!account || !mainContract) return;
